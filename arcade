@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gip & zay's arcade</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* some cursor styling for funzies */
+    html, body {
+      background-color: var(--bg-color);
+      transition: background 0.3s, color 0.3s;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      text-align: center;
+      overflow-x: hidden;
+      cursor: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 24 24"><path fill="%23000000" stroke="%23F54927" stroke-width="1.5" d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87a.5.5 0 0 0 .35-.85L6.35 2.85a.5.5 0 0 0-.85.35Z"></path></svg>') 6 3, auto;
+    }
+
+    :root.theme-default {
+      --accent-color: #f54927;
+      --bg-color: #1c1c1c;
+      --text-color: #ffffff;
+    }
+
+    :root.theme-monsoon {
+      --accent-color: #a3a3a3;
+      --bg-color: #0f0f0f;
+      --text-color: #ffffff;
+    }
+
+    :root.theme-bluemoon {
+      --accent-color: #3da9fc;
+      --bg-color: #0b132b;
+      --text-color: #ffffff;
+    }
+
+    :root.theme-ruby {
+      --accent-color: #ff0000;
+      --bg-color: #200000;
+      --text-color: #ffffff;
+    }
+
+    :root.theme-lime {
+      --accent-color: #00ff00;
+      --bg-color: #051505;
+      --text-color: #ffffff;
+    }
+
+    :root.theme-midnight {
+      --accent-color: #3b4a5c; 
+      --bg-color: #050817; 
+      --text-color: #ffffff;
+    }
+
+    :root.theme-aurora {
+      --accent-color: #4fd1c5;
+      --bg-color: #0b0f1a;
+      --text-color: #ffffff;
+    }
+
+    :root.theme-twilight {
+      --accent-color: #b19cd9;
+      --bg-color: #1a0d2f;
+      --text-color: #ffffff;
+    }
+
+    img:hover, button:hover, a:hover, .game-img:hover, #tab-home-btn:hover {
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 24 24'%3E%3Cpath fill='%23000000' stroke='%23F54927' stroke-width='1.5' stroke-linejoin='round' d='M10 11V8.99c0-.88.59-1.64 1.44-1.86h.05A1.99 1.99 0 0 1 14 9.05V12v-2c0-.88.6-1.65 1.46-1.87h.05A1.98 1.98 0 0 1 18 10.06V13v-1.94a2 2 0 0 1 1.51-1.94h0A2 2 0 0 1 22 11.06V14c0 .6-.08 1.27-.21 1.97a7.96 7.96 0 0 1-7.55 6.48 54.98 54.98 0 0 1-4.48 0 7.96 7.96 0 0 1-7.55-6.48C2.08 15.27 2 14.59 2 14v-1.49c0-1.11.9-2.01 2.01-2.01h0a2 2 0 0 1 2.01 2.03l-.01.97v-10c0-1.1.9-2 2-2h0a2 2 0 0 1 2 2V11Z'/%3E%3C/svg%3E") 18 18, pointer !important;
+    }
+
+
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+    }
+
+    input[type=number] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    .custom-select {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 10px;
+      width: 160px;
+    }
+
+    .custom-select select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-color: #1e1e1e;
+      color: white;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 8px 32px 8px 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 15px;
+      width: 100%;
+      text-align: center;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    ::selection {
+      color: white;
+      background-color: var(--accent-color);
+    }
+
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 3;
+      opacity: 1;
+      transition: opacity 1.1s ease;
+    }
+
+    #loading-text {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    #loading-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .navigation-bar {
+      position: fixed;
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      padding: 20px 30px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(30, 30, 30, 0.6);
+      backdrop-filter: blur(3px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      z-index: 100;
+    }
+
+    .nav-title {
+      margin: 0;
+    }
+
+    .nav-icons {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .nav-icons img {
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.2s ease, filter 0.2s ease;
+      opacity: 0.7;
+    }
+
+    .nav-icons img:hover {
+      transform: scale(1.1);
+      opacity: 0.9;
+    }
+
+    .nav-icons img.active {
+      opacity: 1;
+      filter: drop-shadow(0 0 4px var(--accent-color));
+    }
+
+    .tab {
+      display: none;
+      width: 90%;
+      height: 94vh;
+      border-radius: 25px;
+      padding: 30px;
+      opacity: 0;
+      transform: scale(0.98);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      z-index: 2;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .tab.active {
+      display: block;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .search-container {
+      display: flex;
+      position: relative;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .search-container .quickapps {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .search-input {
+      width: 300px;
+      max-width: 80%;
+      padding: 14px 20px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 24px;
+      border: none;
+      outline: none;
+      border-radius: 50px;
+      border: 3px solid #141414;
+      background-color: rgba(28, 28, 28, 0.5);
+      color: white;
+      backdrop-filter: blur(5px);
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .search-input:hover {
+      border: 3px solid var(--accent-color);
+      box-shadow: 0 0 5px #000000;
+    }
+
+    .search-input:focus {
+      transform: scale(1.15);
+      background-color: rgba(38, 38, 38, 0.6);
+      backdrop-filter: blur(10px);
+      border: 3px solid var(--accent-color);
+    }
+
+    #searchFrame {
+      display: none;
+      width: 100%;
+      height: 600px;
+      border: none;
+      border-radius: 10px;
+      background-color: #1a1a1a;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+    }
+
+    #backBtn {
+      display: none;
+      background: #1e1e1e;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      border: 0px solid #000000;
+    }
+
+    #backBtn:hover {
+      background: #141414;
+      border: 3px solid var(--accent-color);
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      masonry-auto-flow: next;
+      gap: 25px;
+      margin-top: 40px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 50%;
+    }
+
+    .settings-box {
+      background-color: rgba(30, 30, 30, 0.65);
+      border-radius: 15px;
+      padding: 10px 20px 20px 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(4px);
+      gap: 12px;
+      min-height: 160px;
+      padding-top: 10px;
+      max-width: 300px;
+      break-inside: avoid;
+    }
+
+    .settings-box h2 {
+      font-size: 22px;
+      margin-bottom: 15px;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .enable-btn, .disable-btn {
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px;
+      border: none;
+      background-color: rgba(40, 40, 40, 0.6);
+      border-radius: 20px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      color: white;
+      border: 0px solid var(--accent-color);
+      backdrop-filter: blur(10px);
+    }
+
+    .enable-btn:hover, .disable-btn:hover {
+      transform: scale(1.05);
+      background: rgba(36, 36, 36, 0.6);
+      border: 3px solid var(--accent-color);
+    }
+
+    .enable-btn:active, .disable-btn:active {
+      transform: scale(0.95);
+      background: rgba(30, 30, 30, 0.6);
+    }
+
+    .tab h2 {
+      font-size: 28px;
+      margin-top: 60px;
+    }
+
+    .tab h3 {
+      font-size: 24px;
+    }
+
+    #particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .search-container a img {
+      border-radius: 12px;
+      transition: all 0.15s ease;
+    }
+
+    .search-container a.discord img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px #5865F2;
+    }
+
+    .search-container a.tiktok img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px #000000;
+    }
+
+    .search-container a.youtube img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px #FF0000;
+    }
+
+    #loadingDelayInput {
+      font-family: 'Poppins', sans-serif;
+      border: 1px solid #444;
+      background-color: rgba(30, 30, 30, 0.8);
+      color: white;
+      text-align: center;
+      width: 50%;
+      padding: 8px;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    #customCloakTitle, #customCloakIcon {
+      font-family: 'Poppins', sans-serif;
+      border: 1px solid #444;
+      background-color: rgba(30, 30, 30, 0.8);
+      color: white;
+      text-align: center;
+      width: 65%;
+      padding: 8px;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .game-img, .apps-img {
+      transition: all 0.15s ease;
+      border: 0px solid var(--accent-color);
+      object-fit: cover;
+    }
+
+    .game-img:hover, .apps-img:hover {
+      transform: scale(1.1);
+      border: 3px solid var(--accent-color);
+      cursor: pointer;
+    }
+
+    .games, .apps {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    #tabCloakSelect {
+      width: 100%;
+      max-width: 150px;
+      padding: 8px 25px;
+      background-color: #1e1e1e;
+      color: #f2f2f2;
+      border: 1px solid #444;
+      border-radius: 6px;
+      font-size: 15px;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-left: auto; 
+      margin-right: auto;
+      display: block;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    #themeSelect {
+      width: 100%;
+      max-width: 150px;
+      padding: 8px 25px;
+      background-color: #1e1e1e;
+      color: #f2f2f2;
+      border: 1px solid #444;
+      border-radius: 6px;
+      font-size: 15px;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-left: auto; 
+      margin-right: auto;
+      display: block;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    #notification-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .notification {
+      background: rgba(40, 40, 40, 0.9);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      padding: 12px 20px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transform: translateX(120%);
+      transition: all 0.2s ease;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    #viewer {
+      position: relative;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+    }
+
+
+    #gameFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    #gameFrame:fullscreen {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      margin: 0;
+      padding: 0;
+    }    
+
+    #gameFrame:-webkit-full-screen {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --accent-color: #f54927;
+      --bg-color: #1c1c1c;
+      --settings-color:#1e1e1e;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loading-screen">
+    <img id="loading-gif" src="" alt="Loading GIF"
+      style="width: 150px; height: auto; margin-bottom: 20px; display: none; border-radius: 10px;">
+    <div id="loading-text"></div>
+  </div>
+
+  <div class="navigation-bar">
+    <h2 class="nav-title">gip & zay's arcade</h2>
+    <div class="nav-icons">
+      <img id="tab-home-btn" src="https://i.postimg.cc/zbPSB7Dg/icons8-home-500.png" alt="home" class="active">
+      <img id="tab-games-btn" src="https://i.postimg.cc/tsVStCzT/controller.png" alt="games">
+      <img id="tab-apps-btn" src="https://i.postimg.cc/rD3Sj1pq/apps.png" alt="apps">
+      <img id="tab-settings-btn" src="https://i.postimg.cc/87BynXxh/settings.png" alt="settings">
+    </div>
+  </div>
+
+  <div id="home" class="tab active">
+    <div class="search-container">
+      <h2>gip & zay's arcade</h2>
+      <input type="text" id="searchInput" class="search-input" placeholder="search something...">
+      <button id="backBtn">back to search</button>
+      <iframe id="searchFrame" style="width:100%; height:500px;"></iframe>
+      <div class="quickapps">
+        <a href="https://07ae19cb-c00d-47ea-8d09-df6e72e2243c-00-2mh4jhtdllgpn.janeway.replit.dev/?url=https://discord.com/"
+          class="discord">
+          <img src="https://i.postimg.cc/VSqwcCQj/pngimg-com-discord-PNG8.png" width="100" height="auto">
+        </a>
+        <a href="https://07ae19cb-c00d-47ea-8d09-df6e72e2243c-00-2mh4jhtdllgpn.janeway.replit.dev/?url=https://tiktok.com/"
+          class="tiktok">
+          <img src="https://i.postimg.cc/svHvmR03/tiktok.png" width="100" height="auto">
+        </a>
+        <a href="https://07ae19cb-c00d-47ea-8d09-df6e72e2243c-00-2mh4jhtdllgpn.janeway.replit.dev/?url=https://youtube.com/"
+          class="youtube">
+          <img src="https://i.postimg.cc/YSQ5Qx4R/youtube-logo-1.png" width="100" height="auto">
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="games" class="tab">
+    <br><br><br><br>
+    <h2>games</h2>
+    <div class="games">
+      <img src="https://i.postimg.cc/0rq7qqvJ/Crossy-Road-icon.jpg" width="150" height="auto"
+        style="cursor:pointer; border-radius: 12px;" class="game-img"
+        data-html="&lt;!doctype html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;base href=&quot;https://rawcdn.githack.com/bubbls/youtube-playables/3fa3b6dbb7675ba6d708abe1ba272e67607ba807/crossy-road/&quot;&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;&lt;title&gt;Crossy Road&lt;/title&gt;&lt;script src=&quot;https://cdn.jsdelivr.net/gh/cooldude2349/bugfixes@main/cross-yt.js&quot;&gt;&lt;/script&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;style.css&quot;&gt;&lt;script src=&quot;scripts/three.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;https://cdn.jsdelivr.net/gh/cooldude2349/bugfixes@main/cross-main2.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;scripts/extra.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;scripts/bootstrap.min.js&quot;&gt;&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;canvas id=&quot;canvas&quot;&gt;&lt;/canvas&gt;&lt;div id=&quot;build-number&quot;&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;">
+      <img src="https://i.postimg.cc/DyDYxjbn/The-Binding-of-Isaac.webp" width="150" height="auto"
+        style="cursor:pointer; border-radius: 12px;" class="game-img"
+        data-html="&lt;Module&gt;&lt;!-- Ultimate Game Stash file--&gt;&lt;!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ --&gt;&lt;ModulePrefs title=&quot;Google.com&quot; /&gt;&lt;Content type=&quot;html&quot;&gt;&lt;![CDATA[&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta http-equiv=&quot;x-ua-compatible&quot; content=&quot;ie=edge&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/gh/AndreajnRcm4/b398dl2h74v@9a23fbb2373d743a564873251cbb57736ebc1f73/style.css&quot; type=&quot;text/css&quot;&gt;&lt;/head&gt;&lt;body&gt;&lt;script src=&quot;https://cdn.jsdelivr.net/gh/u-cvlassrom-y/google@main/ruffle.js&quot;&gt;&lt;/script&gt;&lt;object width=&quot;100%&quot; height=&quot;100%&quot;&gt;&lt;param name=&quot;movie&quot; value=&quot;https://cdn.jsdelivr.net/gh/RobiFet/CMinterview@a4017231eca9f2173ad7ec0e63b01e4786b4ad6b/web/src/BiWrath.swf&quot;&gt;&lt;embed src=&quot;https://cdn.jsdelivr.net/gh/RobiFet/CMinterview@a4017231eca9f2173ad7ec0e63b01e4786b4ad6b/web/src/BiWrath.swf&quot; width=&quot;100%&quot; height=&quot;100%&quot;&gt;&lt;/object&gt;&lt;/body&gt;&lt;/html&gt;]]&gt;&lt;/Content&gt;&lt;/Module&gt;">
+      <img
+        src="https://i.postimg.cc/qMhdBCsx/polytrack-just-had-a-huge-update-with-new-environments-and-v0-Hego0e-Otvphm-yx1UMG7Bv5iu6XErf-Dk0NPz.webp"
+        width="150" height="auto" style="cursor:pointer; border-radius: 12px;" class="game-img"
+        data-html="&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;base href=&quot;https://cdn.jsdelivr.net/gh/genizy/polytrack@main/&quot;&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no&quot;&gt;&lt;script&gt;window.jkdfgnjkndfg=document.querySelector('base').href;fetch(&quot;simulation_worker.bundle.js&quot;).then(res =&gt; res.text()).then(text =&gt; {const blob=new Blob([text.replaceAll(&quot;replacethisplease&quot;,window.jkdfgnjkndfg)],{type:'application/javascript'});window.simulationworker=URL.createObjectURL(blob);});const ogworker=window.Worker;window.Worker=function(scripturl,options){if(typeof scripturl==='string' &amp;&amp; scripturl.toLowerCase()==&quot;simulation_worker.bundle.js&quot;){scripturl=window.simulationworker;}return new ogworker(scripturl,options);};window.Worker.prototype=ogworker.prototype;const ogfetch=window.fetch;window.fetch=async function(input,init){if(typeof input==='string'){input=input.replace(&quot;vps.kodub.com:43273&quot;,&quot;vpskodub.tmena1565.workers.dev&quot;);}else if(input instanceof Request){const newUrl=input.url.replace(&quot;vps.kodub.com:43273&quot;,&quot;vpskodub.tmena1565.workers.dev&quot;);input=new Request(newUrl,input);}return ogfetch(input,init);};const ogxml=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(method,url,...rest){if(typeof url==='string'){url=url.replace(&quot;vps.kodub.com:43273&quot;,&quot;vpskodub.tmena1565.workers.dev&quot;);}return ogxml.call(this,method,url,...rest);};&lt;/script&gt;&lt;link rel=&quot;manifest&quot; href=&quot;manifest.json&quot;/&gt;&lt;/head&gt;&lt;body&gt;&lt;canvas id=&quot;screen&quot;&gt;&lt;/canvas&gt;&lt;div id=&quot;ui&quot;&gt;&lt;/div&gt;&lt;div id=&quot;transition-layer&quot;&gt;&lt;/div&gt;&lt;script type=&quot;module&quot; src=&quot;main.bundle.js&quot; defer&gt;&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;">
+      <img src="https://i.postimg.cc/65NDK1pC/REPO.webp" width="150" height="auto"
+        style="cursor:pointer; border-radius: 12px;" class="game-img"
+        data-html="&lt;!DOCTYPE html&gt;&lt;html lang=&quot;en-us&quot;&gt;&lt;head&gt;&lt;base href=&quot;https://cdn.jsdelivr.net/gh/genizy/web-port@main/repo/&quot;&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;&lt;title&gt;Unity WebGL Player | R.E.P.O&lt;/title&gt;&lt;link rel=&quot;shortcut icon&quot; href=&quot;TemplateData/favicon.ico&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;TemplateData/style.css&quot;&gt;&lt;style&gt;html,body{margin:0;padding:0;overflow:hidden;height:100%;width:100%;}#unity-container{width:100%;height:100%;position:fixed;top:0;left:0;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div id=&quot;loading-text&quot; style=&quot;color:black;font-family:cursive;font-size:48px;text-align:center;margin-top:20px;&quot;&gt;LOADING...&lt;/div&gt;&lt;div id=&quot;unity-container&quot; class=&quot;unity-desktop&quot; hidden&gt;&lt;canvas id=&quot;unity-canvas&quot; tabindex=&quot;-1&quot;&gt;&lt;/canvas&gt;&lt;div id=&quot;unity-loading-bar&quot;&gt;&lt;div id=&quot;unity-logo&quot;&gt;&lt;/div&gt;&lt;div id=&quot;unity-progress-bar-empty&quot;&gt;&lt;div id=&quot;unity-progress-bar-full&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id=&quot;unity-warning&quot;&gt; &lt;/div&gt;&lt;/div&gt;&lt;script&gt;var container=document.querySelector(&quot;#unity-container&quot;);var canvas=document.querySelector(&quot;#unity-canvas&quot;);var loadingBar=document.querySelector(&quot;#unity-loading-bar&quot;);var progressBarFull=document.querySelector(&quot;#unity-progress-bar-full&quot;);var fullscreenButton=document.querySelector(&quot;#unity-fullscreen-button&quot;);var warningBanner=document.querySelector(&quot;#unity-warning&quot;);function unityShowBanner(msg,type){function updateBannerVisibility(){warningBanner.style.display=warningBanner.children.length? 'block':'none';}var div=document.createElement('div');div.innerHTML=msg;warningBanner.appendChild(div);if(type=='error')div.style='background:red;padding:10px;';else{if(type=='warning')div.style='background:yellow;padding:10px;';setTimeout(function(){warningBanner.removeChild(div);updateBannerVisibility();},5000);}updateBannerVisibility();}function mergeFiles(fileParts){return new Promise((resolve,reject)=>{let buffers=[];function fetchPart(index){if(index>=fileParts.length){let mergedBlob=new Blob(buffers);let mergedFileUrl=URL.createObjectURL(mergedBlob);resolve(mergedFileUrl);return;}fetch(fileParts[index]).then((response)=>response.arrayBuffer()).then((data)=>{buffers.push(data);fetchPart(index+1);}).catch(reject);}fetchPart(0);});}function getParts(file,start,end){let parts=[];for(let i=start;i<=end;i++){parts.push(file+'.part'+i);}return parts;}Promise.all([mergeFiles(getParts('Build/NewestBuild.wasm.gz',1,3)),mergeFiles(getParts('Build/NewestBuild.data.gz',1,16))]).then(([wasmUrl,dataUrl])=>{container.hidden=false;var buildUrl='Build';var loaderUrl=buildUrl+'/NewestBuild.loader.js';var config={dataUrl:dataUrl,frameworkUrl:buildUrl+'/NewestBuild.framework.js',codeUrl:wasmUrl,streamingAssetsUrl:'StreamingAssets',companyName:'Stupid Game',productName:'R.E.P.O',productVersion:'0.1'};if(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)){var meta=document.createElement('meta');meta.name='viewport';meta.content='width=device-width,height=device-height,initial-scale=1.0,user-scalable=no,shrink-to-fit=yes';document.getElementsByTagName('head')[0].appendChild(meta);container.className='unity-mobile';canvas.className='unity-mobile';}else{function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;canvas.style.width=window.innerWidth+'px';canvas.style.height=window.innerHeight+'px';}resizeCanvas();window.addEventListener('resize',resizeCanvas);}loadingBar.style.display='block';var script=document.createElement('script');script.src=loaderUrl;script.onload=()=>{createUnityInstance(canvas,config,(progress)=>{progressBarFull.style.width=100*progress+'%';}).then((unityInstance)=>{loadingBar.style.display='none';document.querySelector('#loading-text').remove();}).catch((message)=>{alert(message);});};document.body.appendChild(script);});&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;">
+      <img src="https://i.postimg.cc/gjK4msMY/bitlife.png" width="150" height="auto"
+        style="cursor:pointer; border-radius: 12px;" class="game-img"
+        data-html="&lt;html lang=&quot;en-us&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;&lt;title&gt;BitLife - Life Simulator&lt;/title&gt;&lt;style&gt;body{font-family:&quot;Myriad Pro&quot;,Myriad,&quot;Helvetica Neue&quot;,Helvetica,Arial,sans-serif;margin:0;padding:0;position:absolute;height:100%;width:100%;background-size:cover;font-style:regular}.webgl-content{background:#333}#errorBrowserBlock,#loadingBlock,.webgl-content{padding:0;position:absolute;height:100vh;width:100vw}canvas{position:absolute;height:100%;width:100%}#gameContainer{position:absolute;height:100%;width:100%}#fullScreenButton,#logoname{height:35px;width:35px;position:absolute;bottom:5px;right:5px;background-color:transparent;background-image:url(../img/fullScreen_on.png);background-size:35px 35px;border:none;cursor:pointer}#logoname{background-image:url(../img/logo-big.png);left:15px;bottom:11px;width:141px;height:20px;background-size:141px 20px}.subtitle{color:#fff;font-size:15px;padding-bottom:15px;padding-top:15px;display:block;margin:auto;text-align:center}.logo{display:block;margin:20px auto;width:265px;height:60px}.logo-game{height:150px;width:auto;display:block;margin:auto;margin-top:5px;border-radius:20px;box-shadow:0 20px 20px -10px rgba(0,0,0,.3)}#errorBrowserBlock,#loadingBlock{background:#333;background-size:cover;z-index:1}.cover{position:absolute;z-index:-1;top:0;right:0;bottom:0;left:0;background-size:cover;opacity:.5;filter:blur(16px)}#errorContent,#progressBar,#warningBrowserBlock,#warningMobileBlock{height:25vh;width:40vw;margin:auto;text-align:center}#progressBar{height:8vh;color:#fff;font-size:4vh}#errorContent,#warningBrowserBlock,#warningMobileBlock{margin-top:15vh;color:#fff;font-size:2.3vh}.browserIcons{display:inline-flex;margin-top:2vh}.browserIcons a{width:150px}#errorContent{font-size:3vh;margin-top:5vh}.centered{height:100%;max-width:770px;margin-left:auto;margin-right:auto}.webgl-content *{border:0;margin:0;padding:0}.webgl-content{height:100%;width:100%}.progress,.webgl-content .logo{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%)}.webgl-content .logo{background:url(logo.png) no-repeat center/contain;width:130px;height:130px}.webgl-content .progress{height:18px;width:141px;margin-top:90px}.webgl-content .progress .empty{background:url(TemplateData/progressEmpty.Light.png) no-repeat right/cover;float:right;width:100%;height:100%;display:inline-block}.webgl-content .progress .full{background:url(TemplateData/progressFull.Light.png) no-repeat left/cover;float:left;width:0%;height:100%;display:inline-block}.webgl-content .logo.Dark{background-image:url(logo.png)}.webgl-content .progress.Dark .empty{background-image:url(TemplateData/progressEmpty.Dark.png)}.webgl-content .progress.Dark .full{background-image:url(TemplateData/progressFull.Dark.png)}.webgl-content .footer{margin-top:5px;height:38px;line-height:38px;font-family:Helvetica,Verdana,Arial,sans-serif;font-size:18px}.fullscreen,.title,.webgl-content .footer .webgl-logo{height:100%;display:inline-block;background:transparent center no-repeat}.webgl-content .footer .webgl-logo{background-image:url(TemplateData/webgl-logo.png);width:204px;float:left}.webgl-content .footer .title{margin-right:10px;float:right}.webgl-content .footer .fullscreen{background-image:url(TemplateData/fullscreen.png);width:38px;float:right}body,html{margin:0 auto;padding:0 auto;width:62vh;height:100%;overflow:hidden}#links2{position:absolute;right:0;bottom:0;padding:8px;list-style:none;background-color:#fff;border-top-left-radius:5px}#links2 ul{list-style-type:none;margin:0;padding:0}#links2 ul li{display:inline}#links2 ul li a{color:#000;display:inline-block;margin-right:10px;text-decoration:none}#links2 ul li a.visited{color:#000}#links2 ul li a:hover{opacity:.85}&lt;/style&gt;&lt;link rel=&quot;canonical&quot; href=&quot;/&quot;&gt;&lt;script src=&quot;https://cdn.jsdelivr.net/gh/a456pur/seraph@ae2fcc6d6a9cd051654fcc0519080db1f79cf2a7/games/bitlife/TemplateData/UnityProgress.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;https://cdn.jsdelivr.net/gh/a456pur/seraph@ae2fcc6d6a9cd051654fcc0519080db1f79cf2a7/games/bitlife/Build/UnityLoader.js&quot;&gt;&lt;/script&gt;&lt;script&gt;var unityInstance=UnityLoader.instantiate(&quot;gameContainer&quot;,&quot;https://cdn.jsdelivr.net/gh/a456pur/seraph@ae2fcc6d6a9cd051654fcc0519080db1f79cf2a7/games/bitlife/Build/BitLife.json&quot;,{onProgress:UnityProgress});&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;div id=&quot;listLink&quot; style=&quot;width:100%;text-align:center;position:absolute;top:0px;z-index:999;background:rgb(119,119,255);opacity:0.8;&quot;&gt;&lt;ul style=&quot;color:#ffffff;padding:0px;margin:0px;font-size:20px;&quot;&gt;&lt;li style=&quot;padding:5px;display:inline-block;float:left;&quot;&gt;&lt;a href=&quot;&quot; style=&quot;color:#ffffff;text-decoration:none;&quot;&gt;Bitlife&lt;/a&gt;&lt;/li&gt;&lt;li style=&quot;padding:5px;display:inline-block;float:right;&quot;&gt;&lt;a onclick=&quot;return closeBacklinks();&quot; style=&quot;color:#ffffff;text-decoration:none;&quot;&gt;❌&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;div class=&quot;webgl-content&quot;&gt;&lt;div id=&quot;gameContainer&quot; style=&quot;width:100%;height:100%;&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;script&gt;function closeBacklinks(){document.querySelector('#listLink').style.display=&quot;none&quot;}&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;">
+      <img src="https://i.postimg.cc/HnM6J5T3/264.png" width="150" height="auto"
+        style="cursor:pointer; border-radius: 12px;" class="game-img"
+        data-html="&lt;!DOCTYPE html&gt;&lt;html lang=&quot;en-us&quot;&gt;&lt;base href=&quot;https://cdn.jsdelivr.net/gh/abisdbest/classroom.google.com@45b2d69c626dc365753f6922d2c48c4075683ef5/drive.google.com/escape%20road/&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, user-scalable=no&quot;&gt;&lt;title&gt;Escape Road&lt;/title&gt;&lt;link rel=&quot;shortcut icon&quot; href=&quot;icon.png&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;TemplateData/style.css&quot;&gt;&lt;script src=&quot;https://cdn.jsdelivr.net/npm/eruda&quot;&gt;&lt;/script&gt;&lt;script&gt;eruda.init()&lt;/script&gt;&lt;/head&gt;&lt;style&gt;@font-face{font-family:myFirstFont;src:url(Chainwhacks.otf);}#logo-canvas,body{font-family:myFirstFont;}&lt;/style&gt;&lt;body class=&quot;dark&quot;&gt;&lt;div id=&quot;unity-container&quot; class=&quot;unity-desktop&quot;&gt;&lt;p style=&quot;opacity:0;position:absolute;&quot;&gt;_&lt;/p&gt;&lt;canvas id=&quot;unity-canvas&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;&lt;div id=&quot;loading-cover&quot; style=&quot;display:none;background:black;&quot;&gt;&lt;div id=&quot;unity-loading-bar&quot;&gt;&lt;canvas id=&quot;logo-canvas&quot; style=&quot;position:absolute;background-color:black;&quot;&gt;&lt;img src=&quot;loading.png&quot; id=&quot;ld_bg&quot;&gt;&lt;img src=&quot;car-icon.png&quot; id=&quot;ld_car&quot;&gt;&lt;/canvas&gt;&lt;/div&gt;&lt;/div&gt;&lt;img id=&quot;azlogo&quot; class=&quot;az&quot; src=&quot;az_logo.png&quot;&gt;&lt;script type=&quot;57480f3f31f76c75506c83a0-text/javascript&quot;&gt;const container=document.querySelector('#unity-container');const canvas=document.querySelector('#unity-canvas');const loadingCover=document.querySelector('#loading-cover');const fullscreenButton=document.querySelector('#unity-fullscreen-button');const buildUrl='TemplateData';const loaderUrl=buildUrl+'/loader.js';const config={dataUrl:buildUrl+'/data.unityweb',frameworkUrl:buildUrl+'/framework.js.unityweb',codeUrl:buildUrl+'/wasm.unityweb',streamingAssetsUrl:'StreamingAssets',companyName:'1games.io',productName:'Escape Road',productVersion:'2.0',};if(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)){container.className='unity-mobile';config.devicePixelRatio=1;}function delay(ms){return new Promise(r=&gt;setTimeout(r,ms));}async function load(){var az_logo=document.getElementById('azlogo');az_logo.style.opacity=0;logo_loaded=true;az_logo.style.display='none';logo_loaded=false;createUnityInstance(canvas,config,p=&gt;{logo_loading_percent=p;drawCanvas(p);}).then(u=&gt;{window.unityInstance=u;setTimeout(()=&gt;{loadingCover.style.display='none';logo_loaded=true;window.focus();},2000);}).catch(m=&gt;alert(m));}loadingCover.style.display='';var script=document.createElement('script');script.src=loaderUrl;script.onload=()=&gt;load();var logo_loaded=false;var logo_loading_percent=0;window.onresize=()=&gt;drawCanvas(logo_loading_percent);window.onload=()=&gt;drawCanvas(logo_loading_percent);var logo_canvas=document.getElementById('logo-canvas');function drawCanvas(_percent=0){if(logo_loaded)return;resizeLogoCanvas();var ctx=logo_canvas.getContext('2d');var ld_bg=document.getElementById('ld_bg');var ld_car=document.getElementById('ld_car');var _sw=logo_canvas.width/1920;var _sh=logo_canvas.height/1080;if(_percent&gt;1)_percent=1;ctx.drawImage(ld_bg,0,0,logo_canvas.width,logo_canvas.height);ctx.fillStyle='#977e21';var _lw=700;var _lh=50;ctx.fillRect((1920-_lw)*0.5*_sw,(1080-150)*_sh,_lw*_sw,_lh*_sh);ctx.fillStyle='#fad234';var _pad=5;var _pw=(_lw-_pad*2);var _ph=_lh-_pad*2;var _px=(1920-_pw)*0.5;ctx.fillRect(_px*_sw,(1080-150+_pad)*_sh,_pw*_percent*_sw,_ph*_sh);ctx.font='18px myFirstFont';const match=/(?&lt;value&gt;\d+\.?\d*)/;const setFontSize=s=&gt;ctx.font=ctx.font.replace(match,s);setFontSize(35*_sh);ctx.textAlign='center';ctx.fillStyle='#fff';ctx.shadowColor='black';ctx.shadowOffsetY=2;var new_per=parseInt(_percent*100);ctx.fillText(''+new_per+'%',logo_canvas.width/2,logo_canvas.height/2+_sh*425);}function resizeLogoCanvas(){var _w=window.innerWidth;var _h=window.innerHeight;var _nw=_h*16/9;if(_nw&lt;=_w){logo_canvas.width=_nw;logo_canvas.height=_h;}else{logo_canvas.width=_w;logo_canvas.height=_w*9/16;}}document.body.appendChild(script);&lt;/script&gt;&lt;script src=&quot;https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics-compat.js&quot;&gt;&lt;/script&gt;&lt;script type=&quot;57480f3f31f76c75506c83a0-module&quot;&gt;import{initializeApp}from'https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js';import{getAnalytics}from'https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics.js';import{getAuth}from'https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js';const firebaseConfig={apiKey:'AIzaSyC2RwMfh0GMuQMtQdijjUo-MEffB4N9xVY',authDomain:'escape-road-gm1.firebaseapp.com',projectId:'escape-road-gm1',storageBucket:'escape-road-gm1.appspot.com',messagingSenderId:'713881704715',appId:'1:713881704715:web:615cc93a73d9814b24ea0e',measurementId:'G-E8C3TNJE0S'};window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments);}window.gtag('config',firebaseConfig.measurementId,{cookie_domain:location.hostname,cookie_flags:'SameSite=None;Secure',});const app=firebase.initializeApp(firebaseConfig);const auth=getAuth(app);&lt;/script&gt;&lt;script src=&quot;rocket-loader.min.js&quot; data-cf-settings=&quot;57480f3f31f76c75506c83a0-|49&quot; defer&gt;&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;">
+
+      <img src="https://i.postimg.cc/Bn1Pr0qs/cookieclicker.png" width="150" height="auto"
+        style="cursor:pointer; border-radius: 12px;" class="game-img"
+        data-html="&lt;!DOCTYPE html&gt;&lt;!-- Ultimate Game Stash file--&gt; &lt;!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ --&gt;&lt;html&gt;&lt;base href=&quot;https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/cookieclicker/&quot;&gt;&lt;head&gt;&lt;!-- external --&gt;&lt;script type=&quot;text/javascript&quot; src=&quot;//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js&quot;&gt;&lt;/script&gt;&lt;!--&lt;link href=&quot;https://fonts.googleapis.com/css?family=Kavoon&amp;subset=latin,latin-ext&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot;&gt;--&gt;&lt;link href='https://fonts.googleapis.com/css?family=Merriweather:900&amp;subset=latin,latin-ext' rel='stylesheet' type='text/css'&gt;&lt;!-- Facebook Pixel Code --&gt; 	&lt;script&gt;	!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?	n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;	n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;	t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,	document,'script','https://connect.facebook.net/en_US/fbevents.js');	fbq('init', '357399801355203');	fbq('track', 'PageView');	&lt;/script&gt;	&lt;noscript&gt;&lt;img height=&quot;1&quot; width=&quot;1&quot; style=&quot;display:none&quot;	src=&quot;https://www.facebook.com/tr?id=357399801355203&amp;ev=PageView&amp;noscript=1&quot;&gt;&lt;/noscript&gt;&lt;!-- end code --&gt;&lt;!-- /external --&gt;&lt;title&gt;Cookie Clicker&lt;/title&gt;&lt;!--Code and graphics copyright Orteil, 2013-2023Feel free to alter this code to your liking, but please do not re-host it, do not profit from it and do not present it as your own.--&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=900, initial-scale=1&quot;&gt;&lt;link rel=&quot;shortcut icon&quot; href=&quot;img/favicon.ico&quot; /&gt;&lt;script src=&quot;base64.js&quot;&gt;&lt;/script&gt;&lt;script&gt;var VERSION=2.052;var BETA=0;var App=typeof App==='undefined'?0:App;&lt;/script&gt;&lt;link href=&quot;style.css?v=9&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot;&gt;&lt;script  src=&quot;main.js?v=10&quot;&gt;&lt;/script&gt;&lt;!-- ad --&gt;&lt;script src=&quot;showads.js&quot;&gt;&lt;/script&gt;&lt;!-- this just detects adblockers so we can adjust the layout and play nice --&gt;&lt;script async src=&quot;https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js&quot;&gt;&lt;/script&gt;&lt;script&gt;     (adsbygoogle = window.adsbygoogle || []).push({          google_ad_client: &quot;ca-pub-8491708950677704&quot;,          enable_page_level_ads: true     });&lt;/script&gt;&lt;!-- /ad --&gt;&lt;!--[if IE]&gt;&lt;style type=&quot;text/css&quot;&gt;	#ifIE9{display:block;}&lt;/style&gt;&lt;![endif]--&gt;&lt;!--[if lt IE9]&gt;&lt;script src=&quot;excanvas.compiled.js&quot;&gt;&lt;/script&gt;&lt;![endif]--&gt;&lt;/head&gt;&lt;body&gt;&lt;div id=&quot;wrapper&quot;&gt;	&lt;div id=&quot;topBar&quot;&gt;		&lt;div&gt;&lt;b style=&quot;font-weight:bold;&quot;&gt;Cookie Clicker&lt;/b&gt;&amp;trade; &amp;copy; &lt;a href=&quot;//orteil.dashnet.org&quot; target=&quot;_blank&quot; id=&quot;topbarOrteil&quot;&gt;Orteil&lt;/a&gt;, 2023 - &lt;a href=&quot;//dashnet.org&quot; target=&quot;_blank&quot; id=&quot;topbarDashnet&quot;&gt;DashNet&lt;/a&gt;&lt;/div&gt;		&lt;div&gt;&lt;a href=&quot;https://twitter.com/orteil42&quot; target=&quot;_blank&quot; id=&quot;topbarTwitter&quot;&gt;twitter&lt;/a&gt;&lt;/div&gt;		&lt;div&gt;&lt;a href=&quot;https://orteil42.tumblr.com&quot; target=&quot;_blank&quot; id=&quot;topbarTumblr&quot;&gt;tumblr&lt;/a&gt;&lt;/div&gt;		&lt;div style=&quot;position:relative;&quot;&gt;&lt;div style=&quot;width:22px;height:32px;background:url(img/discord.png);position:absolute;left:0px;top:0px;pointer-events:none;&quot;&gt;&lt;/div&gt;&lt;a href=&quot;https://discordapp.com/invite/cookie&quot; target=&quot;_blank&quot; style=&quot;padding-left:16px;&quot; id=&quot;topbarDiscord&quot;&gt;Discord&lt;/a&gt;&lt;/div&gt;		&lt;div style=&quot;position:relative;&quot;&gt;&lt;div style=&quot;width:25px;height:32px;background:url(img/weeHoodie.png);position:absolute;left:-2px;top:0px;pointer-events:none;&quot;&gt;&lt;/div&gt;&lt;a class=&quot;blueLink&quot; href=&quot;http://www.redbubble.com/people/dashnet&quot; target=&quot;_blank&quot; style=&quot;padding-left:12px;&quot; id=&quot;topbarMerch&quot;&gt;Merch!&lt;/a&gt;&lt;/div&gt;		&lt;div style=&quot;position:relative;&quot;&gt;&lt;div style=&quot;width:22px;height:32px;background:url(img/patreon.png);position:absolute;left:0px;top:0px;pointer-events:none;&quot;&gt;&lt;/div&gt;&lt;a class=&quot;orangeLink&quot; href=&quot;https://www.patreon.com/dashnet&quot; target=&quot;_blank&quot; style=&quot;padding-left:16px;&quot; id=&quot;topbarPatreon&quot;&gt;Patreon&lt;/a&gt;&lt;/div&gt;		&lt;div style=&quot;position:relative;display:none;font-weight:bold;&quot; id=&quot;heralds&quot;&gt;&lt;div style=&quot;position:absolute;top:-4px;width:31px;height:39px;background:url(img/heraldFlag.png);left:50%;margin-left:-15px;pointer-events:none;&quot;&gt;&lt;/div&gt;&lt;div id=&quot;heraldsAmount&quot; style=&quot;position:relative;z-index:10;text-shadow:0px 1px 0px #000,0px 0px 6px #ff00e4;color:#fff;&quot;&gt;-&lt;/div&gt;&lt;/div&gt;		&lt;div&gt;&lt;a class=&quot;lightblueLink&quot; style=&quot;font-weight:bold;&quot; href=&quot;https://play.google.com/store/apps/details?id=org.dashnet.cookieclicker&quot; target=&quot;_blank&quot; id=&quot;topbarMobileCC&quot;&gt;Cookie Clicker for Android&lt;/a&gt;&lt;/div&gt;		&lt;div&gt;&lt;a class=&quot;lightblueLink&quot; style=&quot;font-weight:bold;&quot; href=&quot;https://store.steampowered.com/app/1454400/Cookie_Clicker/&quot; target=&quot;_blank&quot; id=&quot;topbarSteamCC&quot;&gt;Cookie Clicker on Steam&lt;/a&gt;&lt;/div&gt;		&lt;div&gt;&lt;a href=&quot;//orteil.dashnet.org/randomgen/&quot; target=&quot;_blank&quot; id=&quot;topbarRandomgen&quot;&gt;RandomGen&lt;/a&gt;&lt;/div&gt;		&lt;div&gt;&lt;a href=&quot;//orteil.dashnet.org/igm/&quot; target=&quot;_blank&quot; id=&quot;topbarIGM&quot;&gt;Idle Game Maker&lt;/a&gt;&lt;/div&gt;		&lt;div style=&quot;float:right;position:relative;&quot;&gt;&lt;div id=&quot;tinyglobe&quot; style=&quot;position:absolute;top:-4px;width:22px;height:22px;background:url(img/tinyglobeSheet.gif);right:4px;top:4px;pointer-events:none;&quot;&gt;&lt;/div&gt;&lt;a id=&quot;changeLanguage&quot; style=&quot;font-variant:small-caps;padding-right:20px;&quot; onmouseover=&quot;INTERVAL_TINYGLOBE=setInterval(function(){var tinyglobe=document.getElementById('tinyglobe');tinyglobe.style.backgroundPosition=(parseInt(tinyglobe.style.backgroundPosition)-22)+'px';},30);&quot; onmouseout=&quot;clearInterval(INTERVAL_TINYGLOBE);&quot;&gt;Change language&lt;/a&gt;&lt;script&gt;document.getElementById('tinyglobe').style.backgroundPosition=(-[0,19,27][Math.floor(Math.random()*3)]*22)+'px';&lt;/script&gt;&lt;/div&gt;		&lt;div id=&quot;links&quot; class=&quot;hoverer&quot;&gt;			Other versions			&lt;div class=&quot;hoverable&quot;&gt;				&lt;a href=&quot;../&quot; target=&quot;_blank&quot; id=&quot;linkVersionLive&quot;&gt;Live version&lt;/a&gt;				&lt;a href=&quot;beta&quot; target=&quot;_blank&quot; id=&quot;linkVersionBeta&quot;&gt;Try the beta!&lt;/a&gt;				&lt;a href=&quot;//orteil.dashnet.org/cookieclicker/v10466&quot; target=&quot;_blank&quot; id=&quot;linkVersionOld&quot;&gt;v. 1.0466&lt;/a&gt;				&lt;a href=&quot;//orteil.dashnet.org/experiments/cookie/&quot; target=&quot;_blank&quot;&gt;Classic&lt;/a&gt;			&lt;/div&gt;		&lt;/div&gt;	&lt;/div&gt;	&lt;div id=&quot;game&quot;&gt;		&lt;div id=&quot;versionNumber&quot; class=&quot;title&quot;&gt;&lt;/div&gt;		&lt;script&gt;document.getElementById('versionNumber').innerHTML='v. '+VERSION;&lt;/script&gt;		&lt;div id=&quot;offGameMessageWrap&quot;&gt;			&lt;div id=&quot;offGameMessage&quot;&gt;				&lt;div id=&quot;loader&quot;&gt;					&lt;div class=&quot;spinnyBig&quot;&gt;&lt;/div&gt;					&lt;div class=&quot;spinnySmall&quot;&gt;&lt;/div&gt;					&lt;div id=&quot;loading&quot; class=&quot;title&quot;&gt;Loading...&lt;/div&gt;					&lt;div id=&quot;failedToLoad&quot; class=&quot;title&quot;&gt;This is taking longer than expected.&lt;br&gt;					&lt;div style=&quot;font-size:65%;line-height:120%;&quot;&gt;&lt;!-- error --&gt;Slow connection? If not, please make sure your javascript is enabled, then refresh.&lt;br&gt;					If problems persist, this might be on our side - wait a few minutes, then hit ctrl+f5!&lt;!-- /error --&gt;&lt;/div&gt;&lt;/div&gt;					&lt;div id=&quot;ifIE9&quot; class=&quot;title&quot; style=&quot;font-size:100%;line-height:120%;&quot;&gt;Your browser may not be recent enough to run Cookie Clicker.&lt;br&gt;You might want to update, or switch to a more modern browser such as Chrome or Firefox.&lt;/div&gt;				&lt;/div&gt;			&lt;/div&gt;		&lt;/div&gt;		&lt;canvas id=&quot;backgroundCanvas&quot;&gt;&lt;/canvas&gt;		&lt;div id=&quot;goldenCookie&quot; class=&quot;goldenCookie&quot;&gt;&lt;/div&gt;		&lt;div id=&quot;seasonPopup&quot; class=&quot;seasonPopup&quot;&gt;&lt;/div&gt;		&lt;div id=&quot;shimmers&quot;&gt;&lt;/div&gt;		&lt;div id=&quot;alert&quot;&gt;&lt;/div&gt;		&lt;div id=&quot;particles&quot;&gt;&lt;/div&gt;		&lt;div id=&quot;sparkles&quot; class=&quot;sparkles&quot;&gt;&lt;/div&gt;		&lt;div id=&quot;notes&quot;&gt;&lt;/div&gt;		&lt;div id=&quot;darken&quot;&gt;&lt;/div&gt;		&lt;div id=&quot;toggleBox&quot; class=&quot;framed prompt&quot;&gt;&lt;/div&gt;		&lt;div id=&quot;promptAnchor&quot;&gt;&lt;div id=&quot;prompt&quot; class=&quot;framed&quot;&gt;&lt;div id=&quot;promptContent&quot;&gt;&lt;/div&gt;&lt;div id=&quot;promptClose&quot; class=&quot;close&quot; style=&quot;display:none;&quot; onclick=&quot;PlaySound('snd/tickOff.mp3');Game.ClosePrompt();&quot;&gt;x&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;		&lt;div id=&quot;ascend&quot;&gt;			&lt;div id=&quot;ascendBG&quot;&gt;&lt;/div&gt;			&lt;div id=&quot;ascendZoomable&quot;&gt;&lt;div id=&quot;ascendContent&quot;&gt;&lt;div id=&quot;ascendUpgrades&quot; style=&quot;position:absolute;&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;			&lt;div id=&quot;ascendOverlay&quot;&gt;&lt;/div&gt;		&lt;/div&gt;		&lt;div id=&quot;debug&quot;&gt;&lt;div id=&quot;devConsole&quot; class=&quot;framed&quot;&gt;&lt;/div&gt;&lt;div id=&quot;debugLog&quot;&gt;&lt;/div&gt;&lt;/div&gt;		&lt;div id=&quot;sectionLeft&quot; class=&quot;inset&quot;&gt;			&lt;canvas id=&quot;backgroundLeftCanvas&quot; style=&quot;z-index:5;&quot;&gt;&lt;/canvas&gt;			&lt;div class=&quot;blackFiller&quot;&gt;&lt;/div&gt;			&lt;div class=&quot;blackGradient&quot;&gt;&lt;/div&gt;			&lt;div id=&quot;sectionLeftInfo&quot;&gt;&lt;/div&gt;			&lt;div id=&quot;cookies&quot; class=&quot;title&quot;&gt;&lt;/div&gt;			&lt;div id=&quot;bakeryNameAnchor&quot;&gt;&lt;div id=&quot;bakeryName&quot; class=&quot;title&quot;&gt;&lt;/div&gt;&lt;/div&gt;			&lt;div id=&quot;specialPopup&quot; class=&quot;framed prompt offScreen&quot;&gt;&lt;/div&gt;			&lt;div id=&quot;buffs&quot; class=&quot;crateBox&quot;&gt;&lt;/div&gt;			&lt;div id=&quot;cookieAnchor&quot;&gt;				&lt;button id=&quot;bigCookie&quot;&gt;&lt;/button&gt;				&lt;div id=&quot;cookieNumbers&quot;&gt;&lt;/div&gt;			&lt;/div&gt;			&lt;div id=&quot;sectionLeftExtra&quot;&gt;&lt;/div&gt;		&lt;/div&gt;		&lt;div class=&quot;separatorLeft&quot; id=&quot;leftBeam&quot;&gt;&lt;/div&gt;		&lt;div class=&quot;separatorRight&quot; id=&quot;rightBeam&quot;&gt;&lt;/div&gt;		&lt;div id=&quot;sectionMiddle&quot; class=&quot;inset&quot;&gt;			&lt;div id=&quot;comments&quot; class=&quot;inset title&quot;&gt;				&lt;div id=&quot;prefsButton&quot; class=&quot;panelButton&quot;&gt;&lt;div class=&quot;subButton&quot;&gt;Options&lt;/div&gt;&lt;/div&gt;				&lt;div id=&quot;statsButton&quot; class=&quot;panelButton&quot;&gt;&lt;div&gt;Stats&lt;/div&gt;&lt;/div&gt;				&lt;div id=&quot;logButton&quot; class=&quot;panelButton&quot;&gt;&lt;div&gt;Info&lt;/div&gt;&lt;div id=&quot;checkForUpdate&quot;&gt;New update!&lt;/div&gt;&lt;/div&gt;				&lt;div id=&quot;legacyButton&quot; class=&quot;panelButton&quot;&gt;&lt;div class=&quot;subButton&quot;&gt;Legacy&lt;/div&gt;&lt;div id=&quot;ascendMeterContainer&quot; class=&quot;smallFramed meterContainer&quot;&gt;&lt;div id=&quot;ascendMeter&quot; class=&quot;meter filling&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;roundedPanel&quot; id=&quot;ascendNumber&quot;&gt;&lt;/div&gt;&lt;div id=&quot;ascendTooltip&quot; class=&quot;framed&quot;&gt;&lt;/div&gt;&lt;/div&gt;				&lt;div id=&quot;commentsText&quot;&gt;					&lt;div id=&quot;commentsText1&quot; class=&quot;commentsText&quot;&gt;&lt;/div&gt;					&lt;div id=&quot;commentsText2&quot; class=&quot;commentsText&quot;&gt;&lt;/div&gt;				&lt;/div&gt;				&lt;div class=&quot;separatorBottom&quot;&gt;&lt;/div&gt;			&lt;/div&gt;			&lt;div id=&quot;centerArea&quot;&gt;				&lt;div id=&quot;buildingsTitle&quot; class=&quot;inset title zoneTitle&quot;&gt;Buildings&lt;/div&gt;				&lt;div id=&quot;buildingsMaster&quot;&gt;&lt;/div&gt;				&lt;div id=&quot;rows&quot;&gt;&lt;/div&gt;				&lt;div id=&quot;menu&quot;&gt;&lt;/div&gt;			&lt;/div&gt;		&lt;/div&gt;		&lt;div id=&quot;sectionRight&quot; class=&quot;inset&quot;&gt;			&lt;!-- ad --&gt;			&lt;div class=&quot;ifNoAds&quot; style=&quot;width:300px;text-align:center;padding:8px 0px;background:rgba(0,0,0,0.95);font-size:10px;opacity:0.5;text-shadow:0px 0px 2px #000,0px 1px 0px #000;text-align:center;&quot;&gt;				Cookie Clicker is mainly supported by ads.&lt;br&gt;Consider unblocking our site or checking out our &lt;a href=&quot;https://www.patreon.com/dashnet&quot; target=&quot;_blank&quot;&gt;Patreon&lt;/a&gt;!			&lt;/div&gt;			&lt;div id=&quot;smallSupport&quot; style=&quot;width:300px;text-align:center;padding-bottom:40px;background:rgba(0,0,0,0.5);position:relative;z-index:100;&quot;&gt;				&lt;script async src=&quot;//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js&quot;&gt;&lt;/script&gt;				&lt;!-- Cookie Clicker Header Responsive --&gt;				&lt;ins class=&quot;adsbygoogle&quot;					 style=&quot;display:block;margin:auto;width:300px;max-height:300px;overflow:hidden;&quot;					 data-ad-client=&quot;ca-pub-8491708950677704&quot;					 data-ad-slot=&quot;7077525342&quot;					 data-ad-format=&quot;rectangle&quot;					 data-full-width-responsive=&quot;true&quot;&gt;&lt;/ins&gt;				&lt;script&gt;				(adsbygoogle = window.adsbygoogle || []).push({});				&lt;/script&gt;				&lt;script&gt;				document.addEventListener('DOMContentLoaded',function(){					setTimeout(function(){						var adSlot=document.querySelector(&quot;ins[data-ad-slot='7077525342']&quot;);						if(adSlot &amp;&amp; adSlot.getAttribute('data-ad-status')=='unfilled')						{							var backfill=document.createElement('div');backfill.innerHTML='&lt;iframe style=&quot;border:none;&quot; src=&quot;https://serve.playsaurus.com/300x250.html&quot; width=&quot;300&quot; height=&quot;250&quot; sandbox=&quot;allow-scripts allow-popups&quot;&gt;&lt;/iframe&gt;';							adSlot.parentNode.replaceChild(backfill,adSlot);						}					},3000);				});				&lt;/script&gt;				&lt;div class=&quot;supportComment&quot;&gt;^ Sponsored link ^&lt;/div&gt;			&lt;/div&gt;			&lt;!-- /ad --&gt;			&lt;div id=&quot;store&quot;&gt;				&lt;div id=&quot;storeTitle&quot; class=&quot;inset title zoneTitle&quot;&gt;Store&lt;/div&gt;				&lt;div id=&quot;toggleUpgrades&quot; class=&quot;storeSection upgradeBox&quot;&gt;&lt;/div&gt;				&lt;div id=&quot;techUpgrades&quot; class=&quot;storeSection upgradeBox&quot;&gt;&lt;/div&gt;				&lt;div id=&quot;vaultUpgrades&quot; class=&quot;storeSection upgradeBox&quot;&gt;&lt;/div&gt;				&lt;div id=&quot;upgrades&quot; class=&quot;storeSection upgradeBox&quot;&gt;&lt;/div&gt;				&lt;div id=&quot;products&quot; class=&quot;storeSection&quot;&gt;&lt;/div&gt;			&lt;/div&gt;			&lt;!-- ad --&gt;			&lt;div id=&quot;detectAds&quot; class=&quot;adBanner&quot; style=&quot;background:transparent;width:1px;height:1px;&quot;&gt;&lt;/div&gt;			&lt;div id=&quot;support&quot; style=&quot;margin-top:130px;&quot;&gt;				&lt;div class=&quot;supportComment&quot;&gt;v Sponsored links v&lt;/div&gt;				&lt;div style=&quot;position:relative;&quot;&gt;					&lt;div style=&quot;position:relative;z-index:100;min-height:250px;&quot;&gt;						&lt;script async src=&quot;//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js&quot;&gt;&lt;/script&gt;						&lt;!-- Cookie Clicker Responsive --&gt;						&lt;ins class=&quot;adsbygoogle&quot;							 style=&quot;display:block;margin:auto;&quot;							 data-ad-client=&quot;ca-pub-8491708950677704&quot;							 data-ad-slot=&quot;9780186019&quot;							 data-ad-format=&quot;auto&quot;							 data-full-width-responsive=&quot;true&quot;&gt;&lt;/ins&gt;						&lt;script&gt;						(adsbygoogle = window.adsbygoogle || []).push({});						&lt;/script&gt;						&lt;script&gt;						document.addEventListener('DOMContentLoaded',function(){							setTimeout(function(){								var adSlot=document.querySelector(&quot;ins[data-ad-slot='9780186019']&quot;);								if(adSlot &amp;&amp; adSlot.getAttribute('data-ad-status')=='unfilled')								{									var backfill=document.createElement('div');backfill.innerHTML='&lt;iframe style=&quot;border:none;&quot; src=&quot;https://serve.playsaurus.com/300x600.html&quot; width=&quot;300&quot; height=&quot;600&quot; sandbox=&quot;allow-scripts allow-popups&quot;&gt;&lt;/iframe&gt;';									adSlot.parentNode.replaceChild(backfill,adSlot);								}							},3000);						});						&lt;/script&gt;						&lt;div style=&quot;height:32px;&quot;&gt;&lt;/div&gt;						&lt;!-- Playsaurus banner --&gt;						&lt;a class=&quot;ad&quot; id=&quot;plad&quot; target=&quot;_blank&quot; title=&quot;AdventureQuest Worlds&quot; style=&quot;width:300px;height:64px;display:block;position:relative;margin:0px auto;&quot;&gt;						&lt;/a&gt;						&lt;script&gt;var plAd=document.getElementById('plad');var plAdList=[['Mr. Mine','playsaurusbanner1.png','https://playsaurusstats.com/redirect.php?url=https%3A%2F%2Fmrmine.com&amp;cmd=pageVisit&amp;gameName=MrMine&amp;utm_source=Dashnet&amp;utm_medium=CC&amp;utm_campaign=CCAd&amp;utm_content=&amp;influencer=&amp;hash=bdf9709304a910abd955a4a9d607f7b2'],['Clicker Heroes','playsaurusbanner2.png','https://playsaurusstats.com/redirect.php?url=https%3A%2F%2Fclickerheroes.com&amp;cmd=pageVisit&amp;gameName=CH1&amp;utm_source=Dashnet&amp;utm_medium=CC&amp;utm_campaign=CCAd&amp;utm_content=&amp;influencer=&amp;hash=a1cb78d7d68c2f6bacd193aef75aa3ce'],['Clicker Heroes','playsaurusbanner3.png','https://playsaurusstats.com/redirect.php?url=https%3A%2F%2Fclickerheroes.com&amp;cmd=pageVisit&amp;gameName=CH1&amp;utm_source=Dashnet&amp;utm_medium=CC&amp;utm_campaign=CCAd&amp;utm_content=&amp;influencer=&amp;hash=a1cb78d7d68c2f6bacd193aef75aa3ce']];var plAdRandom=plAdList[Math.floor(Math.random()*plAdList.length)];plAd.style.background='url(img/'+plAdRandom[1]+') no-repeat';plAd.href=plAdRandom[2];plAd.title=plAdRandom[0];&lt;/script&gt;						&lt;div style=&quot;height:32px;&quot;&gt;&lt;/div&gt;						&lt;!-- AdventureQuest Worlds banner --&gt;						&lt;a class=&quot;ad&quot; id=&quot;aqad&quot; href=&quot;http://www.aq.com/landing/cookie/?utm_campaign=AQW_CookieClicker&amp;utm_source=CookieClicker&quot; target=&quot;_blank&quot; title=&quot;AdventureQuest Worlds&quot; style=&quot;background:url(img/AQWorlds_CookieClicker_300x40.png) no-repeat;width:300px;height:64px;display:block;position:relative;margin:0px auto;&quot;&gt;						&lt;/a&gt;					&lt;/div&gt;				&lt;/div&gt;			&lt;/div&gt;			&lt;!-- /ad --&gt;		&lt;/div&gt;		&lt;div id=&quot;tooltipAnchor&quot;&gt;&lt;div id=&quot;tooltip&quot; class=&quot;framed&quot; onMouseOut=&quot;Game.tooltip.hide();&quot;&gt;&lt;/div&gt;&lt;/div&gt;		&lt;div id=&quot;preloadImages&quot; style=&quot;display:none;&quot;&gt;&lt;/div&gt;	&lt;/div&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;"">
+      <img src="https://i.postimg.cc/XpSdBWRz/RERUN.png" width="150" height="auto"
+        style="cursor: pointer; border-radius: 12px;" class="game-img"
+        data-html="&lt;!DOCTYPE html&gt;&lt;html lang=&quot;en-us&quot;&gt;&lt;head&gt;&lt;base href=&quot;https://cdn.jsdelivr.net/gh/gn-math/assets@main/260/&quot;&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;&lt;title&gt;Unity WebGL Player | RERUN&lt;/title&gt;&lt;script src=&quot;Build/UnityLoader.js&quot;&gt;&lt;/script&gt;&lt;script&gt;UnityLoader.instantiate(&quot;unityContainer&quot;,&quot;Build/rerundone.json&quot;);&lt;/script&gt;&lt;style&gt;body{margin:0;padding:0;overflow:hidden;}#unityContainer{width:100vw;height:100vh;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div id=&quot;unityContainer&quot;&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;">
+    </div>
+  </div>
+
+  <div id="apps" class="tab">
+    <br><br><br><br>
+    <h2>apps</h2>
+    <div class="apps">
+      <img src="https://i.postimg.cc/85SRy3Gc/Co-Edit.png" width="150" height="auto"
+        style="cursor:pointer; border-radius: 12px;" class="apps-img"
+        data-html="&lt;!DOCTYPE html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;title&gt;CoEdit&lt;/title&gt;&lt;style&gt;*{margin:0;padding:0;box-sizing:border-box;}body{height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#0a0f18,#0f1118);color:#fff;overflow:hidden}.container{display:flex;gap:20px;width:900px;max-width:90%;height:500px}.editor-wrapper{position:relative;flex:1}textarea{width:100%;height:100%;padding:15px;padding-bottom:50px;background:#121820;border-radius:12px;border:1px solid #1e2532;color:#d6deeb;font-family:'Fira Code',monospace;font-size:14px;resize:none;box-shadow:0 4px 15px rgba(0,0,0,0.5);outline:none;transition:border 0.3s ease,background 0.3s ease;white-space:pre}textarea::-webkit-scrollbar{display:none}textarea:focus{border-color:#3064dd}.file-input-wrapper{position:absolute;top:10px;right:10px;z-index:5;display:flex;align-items:center;gap:8px}.file-input-wrapper input[type=&quot;file&quot;]{display:none}.file-input-wrapper label,#downloadBtn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;cursor:pointer;font-size:20px;transition:transform 0.2s ease;background:transparent;border:none}.file-input-wrapper label:hover,#downloadBtn:hover{transform:scale(1.25)}.file-input-wrapper label:active,#downloadBtn:active{transform:scale(0.95)}.folder-icon{color:#fed841}.save-btn{position:absolute;bottom:10px;left:10px;padding:10px 20px;border:none;background:#28a745;color:white;font-weight:600;border-radius:8px;cursor:pointer;font-size:16px;z-index:5;transition:transform 0.2s ease,background 0.2s ease}.save-btn:hover{background:#1e7e34;transform:scale(1.05)}.save-btn:active{transform:scale(0.95)}.preview-wrapper{flex:1;position:relative;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.5);background:#121820;display:flex;flex-direction:column}iframe{width:100%;height:100%;border:none;background:#121820;flex:1}.fullscreen-btn{position:absolute;top:8px;right:8px;padding:10px 20px;border:none;background:#3064dd;color:white;font-weight:600;border-radius:12px;cursor:pointer;font-size:16px;box-shadow:0 4px 12px rgba(0,0,0,0.5);z-index:10;transition:transform 0.2s ease,background 0.2s ease,box-shadow 0.2s ease}.fullscreen-btn:hover{background:#254ca8;box-shadow:0 6px 20px rgba(0,0,0,0.7);transform:scale(1.05)}.fullscreen-btn:active{transform:scale(0.95)}.saved-list{margin-top:10px;display:flex;flex-direction:column;gap:5px;max-height:120px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.2) transparent}.saved-list::-webkit-scrollbar{width:6px}.saved-list::-webkit-scrollbar-track{background:transparent}.saved-list::-webkit-scrollbar-thumb{background-color:rgba(255,255,255,0.2);border-radius:3px}.saved-list div{position:relative;display:flex;align-items:center;gap:5px}.saved-list div button.code-btn{flex:1;padding:6px 8px;padding-right:28px;border:none;background:#14171f;color:white;border-radius:6px;cursor:pointer;text-align:left;position:relative;overflow:hidden}.saved-list div button.code-btn span{display:inline-block;width:calc(100% - 28px)}.saved-list div .delete-btn{position:absolute;top:50%;right:5px;transform:translateY(-50%);width:20px;height:22px;background:transparent;border:none;color:#fff;font-size:22px;font-weight:bold;line-height:22px;cursor:pointer;text-align:center;z-index:10;transition:color 0.15s ease}.saved-list div .delete-btn:hover{color:#ff5555}.saved-list div .edit-btn{position:absolute;top:50%;right:28px;transform:translateY(-50%);width:20px;height:22px;background:transparent;border:none;color:#fff;font-size:18px;font-weight:bold;line-height:22px;cursor:pointer;text-align:center;z-index:10;transition:color 0.15s ease}.saved-list div .edit-btn:hover{color:#ffd700}.toggle-wrapper{position:absolute;bottom:10px;right:10px;display:flex;align-items:center;gap:6px;font-size:12px;color:#aaa;user-select:none}.toggle-switch{position:relative;width:34px;height:18px}.toggle-switch input{display:none}.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#444;border-radius:34px;transition:0.2s ease}.slider:before{position:absolute;content:'';height:14px;width:14px;left:2px;bottom:2px;background-color:white;border-radius:50%;transition:0.2s ease}input:checked + .slider{background-color:#3064dd}input:checked + .slider:before{transform:translateX(16px)}.popup-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(5px);display:flex;justify-content:center;align-items:center;z-index:20;opacity:0;pointer-events:none;transition:opacity 0.2s ease}.popup-overlay.show{opacity:1;pointer-events:all}.popup{background:#1e2532;padding:20px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.7);display:flex;flex-direction:column;gap:12px;width:350px;opacity:0;transform:scale(0.8);transition:opacity 0.2s ease,transform 0.2s ease;position:relative}.popup.show{opacity:1;transform:scale(1)}.popup input{padding:12px;border-radius:8px;border:1px solid #444;background:#121820;color:#fff;font-size:16px;outline:none}.popup button.save-popup-btn{align-self:flex-end;padding:10px 20px;border:none;background:#28a745;color:white;border-radius:8px;cursor:pointer;font-size:16px;font-weight:600;transition:transform 0.2s ease,background 0.2s ease}.popup button.save-popup-btn:hover{background:#1e7e34;transform:scale(1.05)}.popup button.save-popup-btn:active{transform:scale(0.95)}.popup .close-popup{position:absolute;top:2px;right:10px;background:transparent;border:none;color:white;font-size:25px;cursor:pointer;transition:color 0.15s ease}.popup .close-popup:hover{color:#ff5555}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;container&quot;&gt;&lt;div class=&quot;editor-wrapper&quot;&gt;&lt;textarea id=&quot;code&quot; spellcheck=&quot;false&quot;&gt;&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello!&lt;/h1&gt;&lt;p&gt;This is your preview.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;&lt;/textarea&gt;&lt;div class=&quot;file-input-wrapper&quot;&gt;&lt;input type=&quot;file&quot; id=&quot;fileInput&quot; accept=&quot;.html,.htm&quot;&gt;&lt;label for=&quot;fileInput&quot;&gt;&lt;span class=&quot;folder-icon&quot;&gt;📁&lt;/span&gt;&lt;/label&gt;&lt;button id=&quot;downloadBtn&quot;&gt;💾&lt;/button&gt;&lt;/div&gt;&lt;button class=&quot;save-btn&quot; onclick=&quot;openSavePopup()&quot;&gt;Save Code&lt;/button&gt;&lt;div class=&quot;saved-list&quot; id=&quot;savedList&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;preview-wrapper&quot;&gt;&lt;iframe id=&quot;preview&quot;&gt;&lt;/iframe&gt;&lt;button class=&quot;fullscreen-btn&quot; onclick=&quot;fullscreenPreview()&quot;&gt;Preview&lt;/button&gt;&lt;div class=&quot;toggle-wrapper&quot;&gt;&lt;span&gt;Fullscreen Bypass&lt;/span&gt;&lt;label class=&quot;toggle-switch&quot;&gt;&lt;input type=&quot;checkbox&quot; id=&quot;bypassToggle&quot;&gt;&lt;span class=&quot;slider&quot;&gt;&lt;/span&gt;&lt;/label&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;popup-overlay&quot; id=&quot;popupOverlay&quot;&gt;&lt;div class=&quot;popup&quot; id=&quot;savePopup&quot;&gt;&lt;button class=&quot;close-popup&quot; onclick=&quot;closeSavePopup()&quot;&gt;×&lt;/button&gt;&lt;label&gt;What do you want to name your code?&lt;/label&gt;&lt;input type=&quot;text&quot; id=&quot;codeName&quot; placeholder=&quot;Enter name...&quot;&gt;&lt;button class=&quot;save-popup-btn&quot; onclick=&quot;saveCode()&quot;&gt;Save&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;script&gt;function runCode(){const code=document.getElementById('code').value;const previewHTML=`&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;style&gt;html,body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif !important;background:white;color:black}#preview-wrapper,#preview-wrapper *{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif !important}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div id=&quot;preview-wrapper&quot;&gt;${code}&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;`;document.getElementById('preview').srcdoc=previewHTML}function fullscreenPreview(){const code=document.getElementById('code').value;const bypassEnabled=document.getElementById('bypassToggle').checked;if(bypassEnabled){const iframe=document.getElementById('preview');if(iframe.requestFullscreen)iframe.requestFullscreen();else if(iframe.webkitRequestFullscreen)iframe.webkitRequestFullscreen();else if(iframe.msRequestFullscreen)iframe.msRequestFullscreen();}else{const newWindow=window.open('','_blank');newWindow.document.open();newWindow.document.write(code);newWindow.document.close();}}document.getElementById('fileInput').addEventListener('change',function(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(event){document.getElementById('code').value=event.target.result;runCode();};reader.readAsText(file);});document.getElementById('code').addEventListener('input',runCode);document.getElementById('downloadBtn').addEventListener('click',function(){const code=document.getElementById('code').value;const blob=new Blob([code],{type:'text/html'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='index.html';a.click();URL.revokeObjectURL(url);});function openSavePopup(){const overlay=document.getElementById('popupOverlay');const popup=document.getElementById('savePopup');overlay.classList.add('show');setTimeout(()=>popup.classList.add('show'),10);}function closeSavePopup(){const overlay=document.getElementById('popupOverlay');const popup=document.getElementById('savePopup');popup.classList.remove('show');overlay.classList.remove('show');}function saveCode(){let name=document.getElementById('codeName').value.trim();if(!name)return alert('Please enter a name!');const code=document.getElementById('code').value;let uniqueName=name;let counter=1;while(localStorage.getItem('saved_'+uniqueName)){counter++;uniqueName=name+' #'+counter;}localStorage.setItem('saved_'+uniqueName,code);addSavedButton(uniqueName,code);closeSavePopup();document.getElementById('codeName').value='';}function addSavedButton(name,code){const list=document.getElementById('savedList');const container=document.createElement('div');const btn=document.createElement('button');btn.className='code-btn';const textSpan=document.createElement('span');textSpan.textContent=name;btn.appendChild(textSpan);btn.onclick=()=>{document.getElementById('code').value=code;runCode();};const editBtn=document.createElement('button');editBtn.className='edit-btn';editBtn.textContent='✎';editBtn.title='Rename';editBtn.onclick=()=>{const newName=prompt('Enter new name:',name);if(newName&&newName.trim()){const trimmed=newName.trim();if(trimmed!==name){localStorage.setItem('saved_'+trimmed,code);localStorage.removeItem('saved_'+name);textSpan.textContent=trimmed;name=trimmed;}}};const delBtn=document.createElement('button');delBtn.className='delete-btn';delBtn.textContent='×';delBtn.onclick=()=>{container.remove();localStorage.removeItem('saved_'+name);};container.appendChild(btn);container.appendChild(editBtn);container.appendChild(delBtn);list.appendChild(container);}window.onload=function(){for(let i=0;i&lt;localStorage.length;i++){const key=localStorage.key(i);if(key.startsWith('saved_')){addSavedButton(key.replace('saved_',''),localStorage.getItem(key));}}const bypassToggle=document.getElementById('bypassToggle');const savedState=localStorage.getItem('fullscreenBypass');if(savedState!==null){bypassToggle.checked=savedState==='true';}};document.getElementById('bypassToggle').addEventListener('change',function(){localStorage.setItem('fullscreenBypass',this.checked);});document.getElementById('code').addEventListener('keydown',function(e){const textarea=this;const start=textarea.selectionStart;const end=textarea.selectionEnd;if(e.key==='>'){const text=textarea.value.substring(0,start);const match=text.match(/&lt;([a-zA-Z0-9]+)[^&gt;]*$/);if(match){e.preventDefault();const tag=match[1];const insert='&gt;&lt;/'+tag+'&gt;';textarea.value=textarea.value.substring(0,start)+insert+textarea.value.substring(end);textarea.selectionStart=textarea.selectionEnd=start+1;runCode();return;}}if(e.key==='{'){e.preventDefault();const insert='{}';textarea.value=textarea.value.substring(0,start)+insert+textarea.value.substring(end);textarea.selectionStart=textarea.selectionEnd=start+1;runCode();return;}});runCode();&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;">
+    </div>
+  </div>
+
+  <div id="settings" class="tab">
+  <br><br><br><br>
+  <h2>settings</h2>
+
+  <div class="settings-grid">
+    <div class="settings-box">
+      <h3>loading screen</h3>
+      <div class="button-row">
+        <button id="enableLoading" class="enable-btn">enable</button>
+        <button id="disableLoading" class="disable-btn">disable</button>
+      </div>
+    </div>
+
+    <div class="settings-box">
+      <h3>particles</h3>
+      <div class="button-row">
+        <button id="enableParticles" class="enable-btn">enable</button>
+        <button id="disableParticles" class="disable-btn">disable</button>
+      </div>
+    </div>
+
+    <div class="settings-box">
+      <h3>loading delay</h3>
+      <input type="number" id="loadingDelayInput" placeholder="425">
+      <div>
+        <button id="saveDelayBtn" class="enable-btn">save</button>
+      </div>
+    </div>
+
+    <div class="settings-box">
+      <h3>anti-close</h3>
+      <div class="button-row">
+        <button id="enableAntiClose" class="enable-btn">enable</button>
+        <button id="disableAntiClose" class="disable-btn">disable</button>
+      </div>
+    </div>
+
+    <div class="settings-box">
+      <h3>tab cloak</h3>
+      <select id="tabCloakSelect">
+        <option value="mykaty">MyKaty</option>
+        <option value="google">Google</option>
+        <option value="drive">Google Drive</option>
+        <option value="canvas">Canvas</option>
+        <option value="m365">Microsoft 365</option>
+        <option value="deltamath">DeltaMath</option>
+        <option value="aware">Aware</option>
+        <option value="wayground">Wayground</option>
+        <option value="securlypass">securlypass</option>
+        <option value="canva">Canva</option>
+        <option value="desmos">Desmos</option>
+        <option value="hac">HAC</option>
+        <option value="legendsoflearning">Legends of Learning</option>
+        <option value="gguhoh">GoGuardian: Uh oh!</option>
+        <option value="ggrestricted">GoGuardian: Restricted</option>
+        <option value="contentkeeper">ContentKeeper</option>
+        <option value="kahoot">Kahoot</option>
+        <option value="blooket">Blooket</option>
+        <option value="gimkit">Gimkit</option>
+        <option value="nearpod">Nearpod</option>
+        <option value="outlook">Outlook</option>
+        <option value="britannica">Britannica</option>
+        <option value="gale">Gale</option>
+        <option value="typingclub">TypingClub</option>
+        <option value="gizmos">Gizmos</option>
+        <option value="quill">Quill</option>
+      </select>
+      <div class="button-row">
+        <button id="saveCloakBtn" class="enable-btn">save</button>
+        <button id="resetCloakBtn" class="disable-btn">reset</button>
+      </div>
+    </div>
+    <div class="settings-box">
+  <h3>custom tab cloak</h3>
+
+  <input type="text" id="customCloakTitle" placeholder="title">
+  <input type="text" id="customCloakIcon" placeholder="favicon URL">
+
+  <div class="button-row">
+    <button id="saveCustomCloakBtn" class="enable-btn">save</button>
+    <button id="resetCustomCloakBtn" class="disable-btn">reset</button>
+  </div>
+</div>
+ <div class="settings-box">
+  <h3>game launch mode</h3>
+  <div class="custom-select">
+    <select id="launchMode">
+      <option value="blank">about:blank</option>
+      <option value="inpage">inside of this page</option>
+    </select>
+      <div>
+        <button id="saveLaunchBtn" class="enable-btn">save</button>
+      </div>
+  </div>
+</div>
+
+<div class="settings-box">
+      <h3>notifications</h3>
+      <div class="button-row">
+        <button id="enableNotifications" class="enable-btn">enable</button>
+        <button id="disableNotifications" class="disable-btn">disable</button>
+      </div>
+    </div>
+
+  <div class="settings-box">
+  <h3>themes</h3>
+  <select id="themeSelect">
+    <option value="monsoon">monsoon</option>
+    <option value="bluemoon">bluemoon</option>
+    <option value="ruby">ruby</option>
+    <option value="lime">lime</option>
+    <option value="midnight">midnight</option>
+    <option value="aurora">aurora</option>
+    <option value="twilight">twilight</option>
+  </select>
+  <button id="saveThemeBtn" class="enable-btn">save</button>
+  <button id="resetThemeBtn" class="disable-btn">reset</button>
+</div>
+</div>
+</div>
+
+
+
+<canvas id="particles"></canvas>
+<div id="notification-container"></div>
+<div id="viewer" style="z-index: 999; display:none; width:90%; height:80vh; margin:30px auto; border-radius:12px; overflow:hidden; background:#1a1a1a;">
+  <button onclick="closeViewer()" class="disable-btn">close</button>
+  <button onclick="viewerFullscreen()" class="disable-btn">fullscreen</button>
+  <iframe id="gameFrame" style="width:100%; height:100%; border:none; z-index: 1;"></iframe>
+</div>
+
+<div id="results" style="padding:20px; color:white;"></div>
+  
+
+  <script>
+  const messages = [
+    { text: "gucci bucket hat"},
+    { text: "go on filmcave.ru for shows and movies"},
+    { text: "GODLY faps??"},
+    { text: "dear frank ocean: i would listen to your music, but you like boys. mm-mm."},
+    { text: " ", gif: "https://i.postimg.cc/9DzPcScw/cat-flashbang.gif"},
+    { text: "meow?", gif: "https://i.postimg.cc/BnpC15P8/cat-smile.gif"},
+    { text: " ", gif: "https://i.postimg.cc/6T9v9S02/post-this-cat-ryujinr.gif"},
+    { text: "contentkeeper cant do its job"},
+    { text: "are the admins really blocking stuff with goguardian?"},
+    { text: "staff dont know about the goguardian iframe bypass"},
+    { text: "i <3 gip"},
+    { text: "administrators got me on a watchlist"},
+    { text: "OH BOOOYYYYYSSSSS"},
+    { text: "he gets 5 big booms"},
+    { text: "playing coolmathgames when you got this is crazy"},
+    { text: "if the teacher looks at my history im genuinely cooked"},
+    { text: "outtatown, we never run out of money"},
+    { text: "star boy, you're my hero"},
+    { text: "oh my god, he on x games mode"},
+    { text: "i'm selling swag for the high, swag for the low"},
+    { text: "so it has to be, with all this tragedy"},
+    { text: "owa owa"},
+    { text: "she got dark thoughts, let me hear some, yeah"},
+    { text: "yeah, i'm outta luck"},
+    { text: "are we still friends? - tyler, the creator"},
+    { text: "legalize nuclear bombs"},
+    { text: "i got ice on a necklace"},
+    { text: "YOU'RE FIRED!"},
+    { text: "S, U, P, X, R"},
+    { text: "all roads lead to rome"},
+    { text: "sora ai getting too realistic i swear"},
+    { text: "fahhhhh"},
+    { text: "double O buss down the watch, she know that i'm timeless"},
+    { text: "isn't it beautiful outside?"},
+    { text: "hey there fellers!"},
+    { text: "admins cant even do their jobs 🥀"},
+    { text: "ts so peak :D"},
+    { text: "ANYTHING but work 😔🙏"},
+    { text: "unblocked gamez"},
+    { text: "hi thereeeeee"},
+    { text: "flight dolphin laugh sfx"},
+    { text: "yo wsp"},
+    { text: "this website lowk clean tho"},
+    { text: "iframe html element is so tuff"},
+    { text: "teacher thinks im takin notes but im really on the bob"},
+    { text: "close the tab gng the teacher is right behind you 💔🥀"},
+    { text: "you know its over when the teacher blocks files on goguardian 😭"},
+    { text: "bro click off of the tab 🥀"},
+    { text: "GEOMETRY DASH."},
+    { text: "wake up, F1LTHY"},
+    { text: "yall ever watch spongebob for no reason"},
+    { text: "dont skid"},
+    { text: "ultimate game stash is goated ngl"},
+    { text: "hello"},
+    { text: "shoutout to gn-math.github.io"},
+    { text: "play sister location"},
+    { text: '"WE ARE SPARTANS!" who gon tell them ts aint tuff 🥀'},
+    { text: "yo we need more loading screen messages"},
+    { text: "boiii ts tuff 😂😂"},
+    { text: "woah woah woah woah HEY HEY HEY HEY"},
+    { text: "hi chat"},
+    { text: "NATE, WHAT ARE YOU DOING MAN?"},
+    { text: "me n da boiz on chromebooks watching tiktok 😂"},
+    { text: "the teacher's behind me isn't she"},
+    { text: "frogie's arcade needa up their game"},
+    { text: "PLEASE SPEED I NEED THIS", gif: "https://i.postimg.cc/0yvSnkr9/ishowspeed.gif"},
+    { text: "me when social studies homework", gif: "https://i.postimg.cc/VsbbcrCL/cat-holding-head-cat.gif"},
+    { text: "foxy jumpscare", gif: "https://i.postimg.cc/59L9XJgd/fnaf-memes.gif"},
+    { text: " ", gif: "https://i.postimg.cc/hPZYgzm4/cat-dance.gif"},
+    { text: "look at this awesome kitten dancing", gif: "https://i.postimg.cc/DZSyF2qz/dancing-kitty.gif"},
+    { text: "woahhhh jaden's bus is here", gif: "https://i.postimg.cc/2yWBrS2k/jayden.gif"},
+    { text: " ", gif: "https://i.postimg.cc/nzk1XQSG/kitten-in-bath.gif"},
+    { text: "is mayonnaise an instrument?"},
+    { text: "pov frogie's arcade", gif: "https://i.postimg.cc/Dy3jFR5S/thanks-for-inspiration.gif"},
+    { text: " ", gif: "https://i.postimg.cc/ydrMvnz3/loaf-cat-messages-from-the-stars.gif"},
+    { text: "PLEASE ISAAC I NEED THIS", gif: "https://i.postimg.cc/KzgnvW6Z/Screenshot-2025-11-10-3-47-17-PM.png"},
+    { text: "how were we randomly summoned here on earth gng thats what im tryna figure out 🥀"},
+  ];
+
+  const loadingScreen = document.getElementById("loading-screen");
+  const loadingText = document.getElementById("loading-text");
+  const tabs = document.querySelectorAll(".tab");
+  const quickapps = document.querySelector('.search-container .quickapps');
+  const icons = document.querySelectorAll(".nav-icons img");
+  const canvas = document.getElementById("particles");
+  const ctx = canvas.getContext("2d");
+
+  let isTransitioning = false;
+  let particles = [];
+
+  let loadingEnabled = true;
+  let particlesEnabled = true;
+  let anticloseEnabled = false;
+  let notificationsEnabled = true;
+
+  if (localStorage.getItem("notificationsEnabled") === "false") {
+  notificationsEnabled = false;
+  }
+
+  let loadingDelay = 425; // default delay
+
+  const loadingDelayInput = document.getElementById("loadingDelayInput");
+  const saveDelayBtn = document.getElementById("saveDelayBtn");
+
+  if (localStorage.getItem("loadingDelay")) {
+    loadingDelay = parseInt(localStorage.getItem("loadingDelay"));
+    loadingDelayInput.value = loadingDelay;
+  }
+  if (localStorage.getItem("anticloseEnabled") === "true") {
+    anticloseEnabled = true;
+    updateAntiClose();
+  }
+
+  document.getElementById("enableNotifications").onclick = () => {
+    notificationsEnabled = true;
+    localStorage.setItem("notificationsEnabled", true);
+    updateButtons();
+    showNotification("notifications enabled");
+  };
+
+  document.getElementById("disableNotifications").onclick = () => { 
+    notificationsEnabled = false;
+    localStorage.setItem("notificationsEnabled", false);
+    updateButtons();
+    showNotification("notifications disabled");
+  };
+
+  saveDelayBtn.addEventListener("click", () => {
+    const value = parseInt(loadingDelayInput.value);
+    if (!isNaN(value) && value >= 0) {
+      loadingDelay = value;
+      localStorage.setItem("loadingDelay", loadingDelay);
+      showNotification("loading delay saved");
+    } else {
+      alert("please enter a valid number in milliseconds.");
+    }
+  });
+
+  
+  function updateButtons() {
+    document.getElementById("enableLoading").disabled = loadingEnabled;
+    document.getElementById("disableLoading").disabled = !loadingEnabled;
+    document.getElementById("enableParticles").disabled = particlesEnabled;
+    document.getElementById("disableParticles").disabled = !particlesEnabled;
+    document.getElementById("enableAntiClose").disabled = anticloseEnabled;
+    document.getElementById("disableAntiClose").disabled = !anticloseEnabled;
+    document.getElementById("enableNotifications").disabled = notificationsEnabled;
+    document.getElementById("disableNotifications").disabled = !notificationsEnabled;
+  }
+
+  document.getElementById("enableLoading").onclick = () => {
+    loadingEnabled = true;
+    updateButtons();
+    showNotification("loading screen enabled");
+  };
+  document.getElementById("disableLoading").onclick = () => {
+    loadingEnabled = false;
+    updateButtons();
+    showNotification("loading screen disabled");
+  };
+  document.getElementById("enableParticles").onclick = () => {
+    particlesEnabled = true;
+    updateButtons();
+    showNotification("particles enabled");
+  };
+  document.getElementById("disableParticles").onclick = () => {
+    particlesEnabled = false;
+    updateButtons();
+    showNotification("particles disabled");
+  };
+  document.getElementById("enableAntiClose").onclick = () => {
+    anticloseEnabled = true;
+    localStorage.setItem("anticloseEnabled", true);
+    updateButtons();
+    updateAntiClose();
+    showNotification("anti-close enabled");
+  };
+  document.getElementById("disableAntiClose").onclick = () => {
+    anticloseEnabled = false;
+    localStorage.setItem("anticloseEnabled", false);
+    updateButtons();
+    updateAntiClose();
+    showNotification("anti-close disabled");
+  };
+
+  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    anticloseEnabled = false;
+    localStorage.setItem("anticloseEnabled", false);
+  }
+
+  function updateAntiClose() {
+    if (anticloseEnabled) {
+      window.onbeforeunload = function (e) {
+        e.preventDefault();
+        e.returnValue = "Are you sure you want to close this tab?";
+        return e.returnValue;
+      };
+    } else {
+      window.onbeforeunload = null;
+    }
+  }
+
+  updateButtons();
+  updateAntiClose();
+
+  function setrandomloadingtext() {
+    const randomItem = messages[Math.floor(Math.random() * messages.length)];
+    const gif = document.getElementById("loading-gif");
+    gif.style.display = "none";
+    gif.src = "";
+    loadingText.textContent = randomItem.text || "";
+    if (randomItem.gif) {
+      gif.src = randomItem.gif;
+      gif.style.display = "block";
+    }
+  }
+
+  function disableicons(disabled) {
+    icons.forEach(icon => {
+      icon.style.pointerEvents = disabled ? "none" : "auto";
+    });
+  }
+
+  function showloadingscreen(callback) {
+    if (!loadingEnabled) {
+      if (callback) callback();
+      return;
+    }
+    if (isTransitioning) return;
+    isTransitioning = true;
+    disableicons(true);
+    setrandomloadingtext();
+
+    loadingScreen.style.transition = "none";
+    loadingScreen.style.opacity = 1;
+    loadingScreen.style.pointerEvents = "auto";
+    void loadingScreen.offsetHeight;
+    loadingScreen.style.transition = "opacity 1.1s ease";
+
+    setTimeout(() => {
+      loadingScreen.style.opacity = 0;
+      setTimeout(() => {
+        loadingScreen.style.pointerEvents = "none";
+        isTransitioning = false;
+        disableicons(false);
+        if (callback) callback();
+      }, 500);
+    }, loadingDelay);
+  }
+
+  window.addEventListener("load", () => showloadingscreen());
+
+  icons.forEach(icon => {
+    icon.addEventListener("click", () => {
+      if (isTransitioning || icon.classList.contains("active")) return;
+      const targetId = icon.alt;
+      tabs.forEach(tab => tab.classList.remove("active"));
+      icons.forEach(i => i.classList.remove("active"));
+      document.getElementById(targetId).classList.add("active");
+      icon.classList.add("active");
+      showloadingscreen();
+    });
+  });
+
+  function openViewer(url) {
+  const viewer = document.getElementById('viewer');
+  const iframe = document.getElementById('gameFrame');
+
+  iframe.src = url;
+  viewer.style.display = 'block';
+}
+
+  function closeViewer() {
+    const viewer = document.getElementById('viewer');
+    const iframe = document.getElementById('gameFrame');
+
+    iframe.src = '';
+    viewer.style.display = 'none';
+  }
+
+  
+  const searchInput = document.getElementById("searchInput");
+  const searchFrame = document.getElementById("searchFrame");
+  const backBtn = document.getElementById("backBtn");
+
+  searchInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && searchInput.value.trim() !== "") {
+    let query = searchInput.value.trim();
+
+    // If not a URL → make it a Google search
+    if (!query.startsWith("http://") && !query.startsWith("https://")) {
+      query = "https://www.duckduckgo.com/search?q=" + encodeURIComponent(query);
+    }
+
+    const proxyUrl = `http://localhost:8080/?url=${encodeURIComponent(query)}`;
+
+    searchFrame.src = proxyUrl;
+    searchFrame.style.display = "block";
+    backBtn.style.display = "inline-block";
+    searchInput.style.display = "none";
+    quickapps.style.display = "none";
+  }
+});
+
+
+
+
+
+
+  backBtn.addEventListener("click", () => {
+    searchFrame.style.display = "none";
+    backBtn.style.display = "none";
+    searchInput.style.display = "inline-block";
+    searchInput.value = "";
+    quickapps.style.display = "flex";
+  });
+
+  function resizecanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resizecanvas);
+  resizecanvas();
+
+  function createparticles() {
+    return {
+      x: Math.random() * canvas.width,
+      y: canvas.height + 10,
+      size: Math.random() * 3 + 1,
+      speedY: Math.random() * 1.5 + 0.5,
+      opacity: Math.random() * 0.6 + 0.4
+    };
+  }
+
+ function drawparticles() {
+  if (!particlesEnabled) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const accentColor = getComputedStyle(document.body)
+  .getPropertyValue('--accent-color')
+  .trim();
+
+  ctx.fillStyle = accentColor;
+  particles.forEach((p, i) => {
+    ctx.globalAlpha = p.opacity;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.closePath();
+    p.y -= p.speedY;
+    if (p.y < -10) particles[i] = createparticles();
+  });
+  ctx.globalAlpha = 1;
+}
+
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (particlesEnabled) {
+      if (particles.length < 120) particles.push(createparticles());
+      drawparticles();
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  animate();
+
+  const notifContainer = document.createElement("div");
+  notifContainer.id = "notification-container";
+  document.body.appendChild(notifContainer);
+
+  const notifStyle = document.createElement("style");
+  notifStyle.textContent = `
+    #notification-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .notification {
+      background: rgba(40,40,40, 0.8);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      padding: 12px 20px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      opacity: 0;
+      transform: translateX(120%);
+      transition: all 0.2s ease;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .notification .progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      border-radius: 10px;
+      background: var(--accent-color);
+      width: 100%;
+      animation: progressShrink 3s linear forwards;
+    }
+ 
+  @keyframes progressShrink {
+    from {width: 100%;}
+    to {width: 0%;}
+  }`;
+
+  document.head.appendChild(notifStyle);
+
+  function showNotification(message) {
+    if (!notificationsEnabled) return;
+    const note = document.createElement("div");
+    note.classList.add("notification");
+    note.textContent = message;
+
+    const progress = document.createElement("div");
+    progress.classList.add("progress");
+    note.appendChild(progress);
+
+    notifContainer.appendChild(note);
+    setTimeout(() => note.classList.add("show"), 10);
+
+    setTimeout(() => {
+      note.classList.remove("show");
+      setTimeout(() => note.remove(), 200);
+    }, 3000);
+  }
+
+  const cloakSelect = document.getElementById("tabCloakSelect");
+  const saveCloakBtn = document.getElementById("saveCloakBtn");
+  const resetCloakBtn = document.getElementById("resetCloakBtn");
+
+  const cloaks = {
+  default: {
+    title: "gip & zay's arcade",
+    icon: null
+  },
+
+  desmos: {
+    title: "Desmos | Graphing Calculator",
+    icon: "https://help.desmos.com/hc/article_attachments/4413863846413/desmos_icon_square.png"
+  },
+
+  canva: {
+    title: "Home - Canva",
+    icon: "https://static.canva.com/static/images/favicon.ico" 
+  },
+
+  securlypass: {
+    title: "securlypass",
+    icon: "https://www.desmos.com/assets/img/apps/graphing/favicon.ico"
+  },
+
+  wayground: {
+    title: "For Students - Enter your Code | Wayground (Formerly Quizizz)",
+    icon: "https://wayground.com/favicon.ico"
+  },
+
+  aware: {
+    title: "Student",
+    icon: "https://static.schoolobjects.com/images/Eddy-headonly.png"
+
+  },
+  deltamath: {
+    title: "DeltaMath Student Application",
+    icon: "https://www.deltamath.com/favicon.ico"
+  },
+
+  m365: {
+    title: "Apps | M365 Copilot",
+    icon: "https://res.cdn.office.net/officehub/images/content/images/favicon_copilot-4370172aa6.ico"
+  },
+
+  mykaty: {
+    title: "MyKaty",
+    icon: "https://clouddrivecdn.classlink.com/favicons/1145/icon/favicon.ico?1762820617245"
+  },
+
+  google: {
+    title: "Google",
+    icon: "https://www.google.com/favicon.ico"
+  },
+
+  drive: {
+    title: "My Drive - Google Drive",
+    icon: "https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"
+  },
+
+  canvas: {
+    title: "Dashboard",
+    icon: "https://du11hjcvx0uqb.cloudfront.net/br/dist/images/favicon-e10d657a73.ico"
+  },
+
+  legendsoflearning: {
+    title: "Awakening | Legends of Learning",
+    icon: "https://www.legendsoflearning.com/favicon.ico"
+  },
+  hac: {
+    title: "Classwork",
+    icon: "https://homeaccess.katyisd.org/HomeAccess/Media/Themes/Base/Common/favicon.ico"
+  },
+  gguhoh: {
+    title: "Uh oh!",
+    icon: "https://blocked.goguardian.com/favicon.ico"
+  },
+  ggrestricted: {
+    title: "Restricted",
+    icon: "https://blocked.goguardian.com/assets/lock-icon.png"
+  },
+  contentkeeper: {
+    title: "ContentKeeper Content Filtering",
+    icon: "https://ckf09.katyisd.org/favicon.ico"
+  },
+  kahoot: {
+    title: "Enter Game PIN - Kahoot!",
+    icon: "https://kahoot.it/favicon.ico"
+  },
+  blooket: {
+    title: "Play Blooket | Blooket",
+    icon: "https://www.blooket.com/favicon.ico"
+  },
+  gimkit: {
+    title: "Play Gimkit! - Enter game code here | Gimkit",
+    icon: "https://www.gimkit.com/favicon.png"
+  },
+  nearpod: {
+    title: "Nearpod - Join a lesson",
+    icon: "https://nearpod.com/favicon.ico"
+  },
+  outlook: {
+    title: "Outlook",
+    icon: "https://outlook.office.com/mail/favicon.ico"
+  },
+  britannica: {
+    title: "Britannica",
+    icon: "https://school.eb.com/resources/icons/favicons/school/favicon-32x32.png"
+  },
+  gale: {
+    title: "Resources - Seven Lakes Jr. High - Katy ISD Junior High Schools - District Portals",
+    icon: "https://galesupport.com/favicon.ico"
+  },
+  typingclub: {
+    title: "edclub",
+    favicon: "https://static.typingclub.com/m/favicon.png"
+  },
+  gizmos: {
+    title: "ExploreLearning Gizmos - Math & Science Simulations for Students",
+    icon: "https://apps.explorelearning.com/gizmos/assets/favicon-32x32-DCeF0ri0.png"
+  },
+  quill: {
+    title: "Quill.org | Classwork",
+    icon: "https://assets.quill.org/images/shared/favicon.ico"
+  },
+  reflexmath: {
+    title: "Student App",
+    icon: "https://content.explorelearning.com/favicon.ico"
+  },
+};
+
+
+  if (localStorage.getItem("tabCloak")) {
+    const savedCloak = localStorage.getItem("tabCloak");
+    applyCloak(savedCloak);
+    cloakSelect.value = savedCloak;
+  }
+
+  function applyCloak(key) {
+    const cloak = cloaks[key] || cloaks.default;
+    document.title = cloak.title;
+
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.href = cloak.icon;
+  }
+
+  saveCloakBtn.addEventListener("click", () => {
+    const selected = cloakSelect.value;
+    applyCloak(selected);
+    localStorage.setItem("tabCloak", selected);
+    showNotification(`tab cloak set to "${selected}"`);
+  });
+
+  resetCloakBtn.addEventListener("click", () => {
+    localStorage.removeItem("tabCloak");
+    applyCloak("default");
+    cloakSelect.value = "default";
+    showNotification("tab cloak reset");
+  });
+
+const viewer = document.getElementById('viewer');
+const gameFrame = document.getElementById('gameFrame');
+const launchModeSelect = document.getElementById('launchMode');
+const saveLaunchBtn = document.getElementById('saveLaunchBtn');
+
+window.addEventListener('DOMContentLoaded', () => {
+  const savedMode = localStorage.getItem('launchMode');
+  if (savedMode) {
+    launchModeSelect.value = savedMode;
+  }
+});
+
+saveLaunchBtn.addEventListener('click', () => {
+  const selectedMode = launchModeSelect.value;
+  localStorage.setItem('launchMode', selectedMode);
+  showNotification(`game launch mode set to "${selectedMode}"`);
+});
+
+function ensureBase(html, baseHref) {
+  baseHref = baseHref || location.origin + location.pathname.replace(/\/[^/]*$/, '/');
+  if (!/^<!doctype/i.test(html)) html = '<!doctype html>\n' + html;
+  if (!/<base\s/i.test(html)) {
+    if (/<head[\s>]/i.test(html)) {
+      html = html.replace(/<head([\s>])/i, `<head$1\n  <base href="${baseHref}">`);
+    } else {
+      html = html.replace(/(^<!doctype[^>]*>\s*(<html[^>]*>)?)/i, `$1<head><base href="${baseHref}"></head>`);
+    }
+  }
+  return html;
+}
+
+function injectIntoIframe(iframe, html) {
+  return new Promise((resolve, reject) => {
+    const baseHref = location.origin + location.pathname.replace(/\/[^/]*$/, '/');
+    const readyHtml = ensureBase(html, baseHref);
+
+    iframe.onload = null;
+
+    try {
+      if ('srcdoc' in iframe) {
+        iframe.removeAttribute('src');
+        iframe.srcdoc = readyHtml;
+        iframe.onload = () => resolve('srcdoc');
+        setTimeout(() => resolve('srcdoc-timeout'), 2000);
+        return;
+      }
+    } catch (e) {}
+
+    try {
+      const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(readyHtml);
+      iframe.onload = () => resolve('data');
+      iframe.src = dataUrl;
+      setTimeout(() => resolve('data-timeout'), 2000);
+      return;
+    } catch (e) {}
+
+    try {
+      iframe.src = 'about:blank';
+      iframe.onload = () => {
+        try {
+          const doc = iframe.contentWindow.document;
+          setTimeout(() => {
+            doc.open();
+            doc.write(readyHtml);
+            doc.close();
+            resolve('about:blank-write');
+          }, 50);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      setTimeout(() => {
+        try {
+          const doc = iframe.contentWindow && iframe.contentWindow.document;
+          if (doc) {
+            doc.open();
+            doc.write(readyHtml);
+            doc.close();
+            resolve('about:blank-write-timeout');
+          }
+        } catch (err) {
+          reject(err);
+        }
+      }, 1000);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+document.querySelectorAll('[data-html]').forEach(img => {
+  img.addEventListener('click', () => {
+    const html = img.getAttribute('data-html');
+    const mode = launchModeSelect ? launchModeSelect.value : 'blank';
+    const decoded = decodeHtml(html);
+
+    viewer.style.display = 'block';
+
+    if (mode === 'inpage') {
+  const decoded = decodeHtml(html);
+  viewer.style.display = 'block';
+  gameFrame.style.display = '';
+
+  injectIntoIframe(gameFrame, decoded)
+    .then(method => console.info('[inject] injection method:', method))
+    .catch(err => {
+      console.error('[inject] injection failed :pensive: error: ', err);
+      const newTab = window.open('about:blank', '_blank');
+      newTab.document.write(decoded);
+      newTab.document.close();
+    });
+    } else {
+      const newTab = window.open('about:blank', '_blank');
+      newTab.document.write(decoded);
+      newTab.document.close();
+    }
+  });
+});
+
+function decodeHtml(html) {
+  const txt = document.createElement('textarea');
+  txt.innerHTML = html;
+  return txt.value;
+}
+
+function closeViewer() {
+  viewer.style.display = 'none';
+  gameFrame.src = '';
+}
+
+
+function viewerFullscreen() {
+  const viewer = document.getElementById('gameFrame');
+  if (viewer.requestFullscreen) {
+    viewer.requestFullscreen();
+  } else if (viewer.webkitRequestFullscreen) {
+    viewer.webkitRequestFullscreen();
+  } else if (viewer.msRequestFullscreen) {
+    viewer.msRequestFullscreen();
+  }
+}
+
+
+document.addEventListener("fullscreenchange", () => {
+  const isFullscreen = !!document.fullscreenElement;
+  const closeBtn = document.querySelector('#viewer .disable-btn[onclick="closeViewer()"]');
+  const fsBtn = document.querySelector('#viewer .disable-btn[onclick="viewerFullscreen()"]');
+
+  if (!isFullscreen) {
+    closeBtn.style.display = "";
+    fsBtn.style.display = "";
+  }
+});
+
+const themeSelect = document.getElementById("themeSelect");
+const saveThemeBtn = document.getElementById("saveThemeBtn");
+const resetThemeBtn = document.getElementById("resetThemeBtn");
+
+let savedTheme = localStorage.getItem("theme") || "default";
+applyTheme(savedTheme);
+themeSelect.value = savedTheme;
+
+function applyTheme(themeKey) {
+  const root = document.documentElement;
+
+  root.classList.remove("theme-default", "theme-monsoon", "theme-bluemoon", "theme-ruby", "theme-lime", "theme-midnight", "theme-aurora", "theme-twilight");
+
+  switch (themeKey) {
+    case "monsoon":
+      root.classList.add("theme-monsoon");
+      break;
+    case "bluemoon":
+      root.classList.add("theme-bluemoon");
+      break;
+    case "ruby":
+      root.classList.add("theme-ruby");
+      break;
+    case "lime":
+      root.classList.add("theme-lime");
+      break;
+    case "midnight":
+      root.classList.add("theme-midnight");
+      break;
+    case "aurora":
+      root.classList.add("theme-aurora");
+      break;
+    case "twilight":
+      root.classList.add("theme-twilight");
+      break;
+    default:
+      root.classList.add("theme-default");
+      break;
+  }
+}
+
+saveThemeBtn.addEventListener("click", () => {
+  const selected = themeSelect.value;
+  localStorage.setItem("theme", selected);
+  applyTheme(selected);
+  showNotification(`theme set to "${selected}"`);
+});
+
+
+resetThemeBtn.addEventListener("click", () => {
+  localStorage.removeItem("theme");
+  themeSelect.value = "default";
+  applyTheme("default");
+  showNotification("theme reset to default");
+});
+
+
+
+const customTitleInput = document.getElementById("customCloakTitle");
+const customIconInput = document.getElementById("customCloakIcon");
+const saveCustomCloakBtn = document.getElementById("saveCustomCloakBtn");
+const resetCustomCloakBtn = document.getElementById("resetCustomCloakBtn");
+
+if (localStorage.getItem("customCloak")) {
+  const data = JSON.parse(localStorage.getItem("customCloak"));
+  customTitleInput.value = data.title;
+  customIconInput.value = data.icon;
+
+  applyCloak("custom");
+}
+
+
+cloaks.custom = {
+  title: "",
+  icon: ""
+};
+
+
+saveCustomCloakBtn.addEventListener("click", () => {
+  const title = customTitleInput.value.trim();
+  const icon = customIconInput.value.trim();
+
+  if (!title || !icon) {
+    showNotification("please enter both a title and favicon url");
+    return;
+  }
+
+  cloaks.custom.title = title;
+  cloaks.custom.icon = icon;
+
+  localStorage.setItem("customCloak", JSON.stringify({ title, icon }));
+
+  applyCloak("custom");
+  showNotification("custom tab cloak applied");
+});
+
+resetCustomCloakBtn.addEventListener("click", () => {
+  localStorage.removeItem("customCloak");
+  customTitleInput.value = "";
+  customIconInput.value = "";
+
+  const fallback = localStorage.getItem("tabCloak") || "default";
+
+  applyCloak(fallback);
+
+  const oldIcon = document.querySelector("link[rel='icon']");
+  if (oldIcon) oldIcon.remove();
+
+  let newLink = document.createElement("link");
+  newLink.rel = "icon";
+  newLink.href = cloaks[fallback].icon || "";
+  document.head.appendChild(newLink);
+
+  showNotification("custom tab cloak reset");
+});
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
